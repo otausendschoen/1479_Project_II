@@ -1,0 +1,229 @@
+---
+title: "Project_2"
+author: "Oliver Tausendschön, Manuel Carli, Caroline Meyer, Benedek Takacs"
+date: "2023-11-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Scraping the data
+
+To scrape reviews which we can then analyze we use the following packages:
+## set up
+```{r}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(rvest,
+               polite,
+               tidyr,
+               dplyr,
+               ggplot2,
+               tibble,
+               purrr)
+library(tidyverse)
+library(rvest)
+```
+Next up, we create the url object and convert it to an html object:
+
+```{r}
+#url = "https://www.amazon.de/-/en/MPUF3ZD-A/product-reviews/B0BDJH7J5C/ref=cm_cr_arp_d_paging_btm_next_2?ie=UTF8&reviewerType=all_reviews&pageNumber=2"
+url = "https://www.amazon.de/-/en/MPUF3ZD-A/product-reviews/B0BDJH7J5C/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews"
+page <-read_html(url)
+```
+
+
+
+
+##review date
+```{r}
+review_dates <- page %>%
+  html_elements(xpath = "//*[@data-hook='review-date']") %>%
+  html_text()
+# Use str_match on the vector review_dates
+dates <- str_match(review_dates, "on (\\d+\\s[A-Za-z]+\\s\\d{4})")[, 2]
+# Convert the extracted dates to a standard date format
+formatted_dates <- as.Date(dates, format = "%d %B %Y", locale = "de")
+# Display the result
+print(formatted_dates)
+```
+## review rating
+
+
+```{r}
+star_ratings <- page %>%
+  html_elements(xpath = "//*[@data-hook='review-star-rating']") %>%
+  html_text()
+print(star_ratings)
+
+```
+
+## review text
+```{r}
+review_text <- page %>%
+  html_elements(xpath = "//*[@data-hook='review-body']") %>%
+  html_text() %>%
+  str_trim() %>%
+  str_remove_all("<.*?>") %>%
+  str_replace_all("\\s+", " ")
+
+```
+
+```{r}
+review_text <- page %>%
+  html_elements(".review-text-content") %>%
+  html_text() %>%
+  str_trim()
+
+
+```
+
+
+## review head
+
+```{r}
+review_head <- page %>%
+  html_elements(xpath = "//*[@class='cr-original-review-content']") %>%
+  html_text() %>%
+  str_trim() %>%
+  str_remove_all("<.*?>") %>%
+  str_replace_all("\\s+", " ")
+print(review_head)
+```
+
+## create a dataframe:
+
+```{r}
+length(formatted_dates); length(review_text);length(star_ratings)
+reviews <- data.frame(formatted_dates, review_text, star_ratings)
+head(reviews)
+
+```
+
+## loop over pages
+
+```{r}
+url = "https://www.amazon.de/-/en/MPUF3ZD-A/product-reviews/B0BDJH7J5C/ref=cm_cr_getr_d_paging_btm_prev_1?ie=UTF8&reviewerType=all_reviews"
+
+reviews_all<-data.frame(NULL)
+for(i in c(1:10)){
+  url = "https://www.amazon.de/-/en/MPUF3ZD-A/product-reviews/B0BDJH7J5C/ref=cm_cr_getr_d_paging_btm_prev_1?ie=UTF8&reviewerType=all_reviews"
+  if (i == 1){
+    page<-read_html(url)}
+  else{
+    url<-paste0(url, '&pageNumber=', i)
+    print(url)
+    page <-read_html(url)
+    #page <-read_html(paste0(url,'pageNumber=', i))
+  }
+  review_text <- page %>%
+    html_elements(xpath = "//*[@data-hook='review-body']") %>%
+    html_text() %>%
+    str_trim() %>%
+    str_remove_all("<.*?>") %>%
+    str_replace_all("\\s+", " ")
+  star_ratings <- page %>%
+  html_elements(xpath = "//*[@data-hook='review-star-rating']") %>%
+  html_text()
+  review_dates <- page %>%
+    html_elements(xpath = "//*[@data-hook='review-date']") %>%
+    html_text()
+  # Use str_match on the vector review_dates
+  dates <- str_match(review_dates, "on (\\d+\\s[A-Za-z]+\\s\\d{4})")[, 2]
+  # Convert the extracted dates to a standard date format
+  formatted_dates <- as.Date(dates, format = "%d %B %Y", locale = "de")
+
+  reviews <- data.frame(formatted_dates, review_text, star_ratings)
+  print(reviews$formatted_dates)
+  reviews_all=rbind(reviews_all, reviews)
+print(page)
+  }
+
+```
+```{r}
+review_text_all<-c()
+review_dates_all<-c()
+review_stars_all<-c()
+reviews_all<-data.frame(NULL)
+#reviews_all<-data.frame(NULL)
+for(i in c(1:10)){
+  url = "https://www.amazon.de/-/en/MPUF3ZD-A/product-reviews/B0BDJH7J5C/ref=cm_cr_getr_d_paging_btm_prev_1?ie=UTF8&reviewerType=all_reviews"
+  if (i == 1){
+    page<-read_html(url)}
+  else{
+    url<-paste0(url, '&pageNumber=', i)
+    print(url)
+    page <-read_html(url)
+    #page <-read_html(paste0(url,'pageNumber=', i))
+  }
+  review_text <- page %>%
+    html_elements(xpath = "//*[@data-hook='review-body']") %>%
+    html_text() %>%
+    str_trim() %>%
+    str_remove_all("<.*?>") %>%
+    str_replace_all("\\s+", " ")
+  print(review_text)
+  #review_text_all=append(review_text_all, review_text)
+  star_ratings <- page %>%
+    html_elements(xpath = "//*[@data-hook='review-star-rating']") %>%
+    html_text()
+  #review_stars_all=append(review_stars_all, star_ratings)
+  review_dates <- page %>%
+    html_elements(xpath = "//*[@data-hook='review-date']") %>%
+    html_text()
+  # Use str_match on the vecto r review_dates
+  dates <- str_match(review_dates, "on (\\d+\\s[A-Za-z]+\\s\\d{4})")[, 2]
+  # Convert the extracted dates to a standard date format
+  formatted_dates <- as.Date(dates, format = "%d %B %Y", locale = "de")
+  #review_dates_all=append(review_dates_all, formatted_dates)
+
+  reviews <- data.frame(formatted_dates, review_text, star_ratings)
+  print(reviews$formatted_dates)
+  reviews_all=rbind(reviews_all, reviews)
+print(page)
+  }
+#df<-data.frame(review_dates_all, review_text_all, review_stars_all)
+```
+
+```{r}
+scrape_reviews <- function(url) {
+  page <- read_html(url)
+  
+  review_text <- page %>%
+    html_elements(".review-text-content") %>%
+    html_text() %>%
+    str_trim()
+
+  return(review_text)
+}
+
+# Function to scrape reviews from multiple pages
+scrape_reviews_multiple_pages <- function(base_url, num_pages) {
+  all_reviews <- character(0)
+  
+  for (i in 1:num_pages) {
+    current_url <- paste0(base_url, "&pageNumber=", i)
+    reviews_on_page <- scrape_reviews(current_url)
+    
+    all_reviews <- c(all_reviews, reviews_on_page)
+    
+    # Add a delay to avoid being blocked
+    Sys.sleep(3)
+  }
+  
+  return(all_reviews)
+}
+
+# Example usage
+base_url <- "https://www.amazon.com/iPhone-13-Pro-256GB-Graphite/product-reviews/B0BGYBX3LK/ref=cm_cr_arp_d_paging_btm_next_2?ie=UTF8&reviewerType=all_reviews&pageNumber="
+num_pages <- 5  # Set the number of pages to scrape
+
+all_reviews <- scrape_reviews_multiple_pages(base_url, num_pages)
+
+# Print the extracted reviews
+cat(all_reviews, sep = "\n")
+
+```
+

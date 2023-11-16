@@ -144,3 +144,23 @@ print(page)
 ```
 
 
+
+# try it for yelp and see if it works (in principal):
+
+```{r}
+url = "https://www.yelp.at/biz/caf%C3%A9-central-wien-4"
+page <-read_html(url)
+
+page %>% 
+    html_nodes(xpath = "//*[@class=' raw__09f24__T4Ezm']") %>%
+    html_text()
+```
+
+```{r}
+url = "https://www.yelp.at/biz/caf%C3%A9-central-wien-4?start=10"
+page <-read_html(url)
+
+page %>% 
+    html_nodes(xpath = "//*[@class=' raw__09f24__T4Ezm']") %>%
+    html_text()
+```

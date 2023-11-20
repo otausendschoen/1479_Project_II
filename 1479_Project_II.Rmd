@@ -7,13 +7,92 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+#setwd("/Users/carolinemeyer/Desktop/Sem V/1479 (Applications of Data Science) ")
 ```
 
+\newpage
 
-# Scraping the data
 
-To scrape reviews which we can then analyze we use the following packages:
-## set up
+# Report
+
+## Introduction / Abstract
+
+In this Report, we take a deep dive into the world of customer reviews to uncover trends and insights related to a selected product on Amazon.com. With a foundation of about 100 text-based evaluations, the product that we have carefully picked from a product category of our choosing offers big variety of thoughts and comments.
+
+The R code of the entire process is available as an appendix, revealing the details of our analysis procedure. Additionally, our presentation summarises the most significant discoveries, providing a quick overview of the brand's online presence and consumer attitude. The gathered dataset, in.rda format provides the basis for our investigation and creates a clear picture of the brand's interaction with its clientele.
+
+## Our Aims
+
+Our goal is to analyse and extract useful data from the collection of customer reviews. In doing this, we want to provide basic answers that explain the brand's effectiveness and consumer impression.
+
+In order to get a good impression of customer´s opinions, we will analyse common and frequent terms that appear in the reviews of this data. We will also explore temporal dimension, tracking indicators as they change over time to provide insights how the product or the opinions evolve over time. We will be examining the tone of the text to determine the emotional undertones that are typical of customer feedback. Finally, we will interpret the subjects that predominate in customer conversations, revealing the problems and elements that are most important to the clientele.
+
+Our ultimate objective is to offer the brand with insights that can be put into practise as we go through these elements. If the brand's goals are a high star rating and happy consumers, our study will help them in archieving that.
+
+## Preparation
+
+Before analysing the data, we actually have to get the data. We do this by using a basic webscraper to extract important information on the prodct´s review page.
+
+## Scraping the data
+
+To scrape reviews which we can then analyze we start by installing necessary / helpful packages. We could then start with tasks such as HTML parsing and mimicking a browser with a machine.
+
+However, we quickly ran into problems as Amazon makes an effort to prevent scraping, particularly when many pages are being scraped. We started by trying the code with different products and pages, experimenting with differend HTML nodes and xpaths. All this is done with the R-package Rvest. In the end, we created custom headers, a random time out to avoid being "too aggressive" and imitated browser request. We managed to scrape 100 reviews without filtering for specific terms. We then widened our search Searching for specific terms was a possibility to widen our dataset but this comes with the big downside of introducing a bias. We nevertheless decided to continue as one purpose of this project is to carry out a complete analysis and this makes more sense.
+
+We decided to extract information on the title of the reviews, the review content, the review date, whether the review is verified or not, how many people found it helpful, and the star rating. Our dataset thus contains 500 observations with 6 variables.
+
+The variables are the following:
+Review title: This is the title of the review
+Review text: This is the review itself. 
+Formatted_date: This is the date when the review was published.
+Verified: This indicated whether a review is made by an officially verified buyer or not.
+N_helpful: This is the count of people that marked the review as being helpful.
+star_rating_num: This is the score of the review. The maximum is five and minimum is zero. A higher number corresponds to a more positive opinion about the product.
+
+The technical details of the data analysis are provided in the appendix, accompanied by the corresponding R code.
+
+## General Analysis
+
+To get an idea of the data we are working with, We want to start by taking a look at some general features of our review data. We will keep this section short as it only serves to get a basic understanding of the data. 
+
+Let us start by taking a look at **when the reviews were made**:
+The time frame of our reviews spans from 06th of June, 2020, when the first review was published until the 17th of November, 2023, where the most recent one was made. This ensures that we consider reviews in a long time span, considering potential product updates, relaunches and so on.
+
+It is also interesting to get more of an insight into the **general rating behavior**. 
+The **worst rating** is 1 stars, the **highest one** is 5 stars and the **average rating** amounts to 3 stars. This can be shown by using a histogram of the distribution of star ratings. Note that the equal distribution is due to the way our webscraper works.
+
+Another visualization of the **distribution of star ratings** might be helpful to see how the product has performed in general. Thus, here we present a histogram: 
+
+
+![Distribution_of_Stars.](media/test.png)
+
+We can also visalize the average star rating across time. This gives us a good guess of how the quality of the product might deteriorate or improve.
+
+![Development_Stars.](media/Development_Stars.png)
+It seems as the average rating improves in the long term. This is a good sign. Let´s see if there is any correlation wit **the number of reviews published across our time period**
+
+
+It seems as the average rating improves already after the first reviews and stays relatively constant throughout the time period where reviews were published. 
+
+It might also be interesting to take a look at **the number of reviews published across our time period** and see if and how this corresponds to the development of the star ratings. 
+
+![Number_of_reviews.](media/Number_of_reviews.png)
+
+
+We can see a bit of seasonality in this plot but mainly, there is an increasing tendency of the reviews. 
+
+When comparing the two plots we can see that overall the review-situation improved over time: Both more reviews and better reviews were published in long term. The dip in June might be interesting to analyze - especially to see if it remains so apparent when the dataset of reviews is larger and less restricted.
+
+Furthermore, we might want to take a look at **helpfulness of the reviews**. For this we start off with simply wanting to know how the reviews were distribtued in this aspect.
+
+
+
+\newpage
+
+# Appendix {#appendix}
+
+The appendix contains the technical analysis of the available data, including all the corresponding R-code. For the analysis we used the following R-packages:
+
 ```{r}
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(rvest,
@@ -25,142 +104,605 @@ pacman::p_load(rvest,
                purrr)
 library(tidyverse)
 library(rvest)
-```
-Next up, we create the url object and convert it to an html object:
-
-```{r}
-#url = "https://www.amazon.de/-/en/MPUF3ZD-A/product-reviews/B0BDJH7J5C/ref=cm_cr_arp_d_paging_btm_next_2?ie=UTF8&reviewerType=all_reviews&pageNumber=2"
-url = "https://www.amazon.de/-/en/MPUF3ZD-A/product-reviews/B0BDJH7J5C/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews"
-page <-read_html(url)
-```
-
-
-
-
-##review date
-```{r}
-review_dates <- page %>%
-  html_elements(xpath = "//*[@data-hook='review-date']") %>%
-  html_text()
-# Use str_match on the vector review_dates
-dates <- str_match(review_dates, "on (\\d+\\s[A-Za-z]+\\s\\d{4})")[, 2]
-# Convert the extracted dates to a standard date format
-formatted_dates <- as.Date(dates, format = "%d %B %Y", locale = "de")
-# Display the result
-print(formatted_dates)
-```
-## review rating
-
-
-```{r}
-star_ratings <- page %>%
-  html_elements(xpath = "//*[@data-hook='review-star-rating']") %>%
-  html_text()
-print(star_ratings)
-
+library(vctrs)
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(RColorBrewer)
+library(ggplot2)
+library(udpipe)
+library(sentimentr)
+library(textcat)
+library(pscl)
+library(topicmodels)
+library(psych)
 ```
 
-## review text
+Next up, we start our web-scraping to read information from a chosen website. Here we faced two major difficulties: 
+Amazon blocks attempts of webscraping when iterated over numerous pages to avoid bots - this we countered by making the request with customer headers. Additionally, however - and we did not find a solution to this - only 100 reviews can be obtained via this code since to see further requests Amazon allows only searches for certain terms. Although we could have implemented some terms to search for and add the reviews to our dataset, we did not think that this is a proper solution. 
+Thus we went with only 100 reviews to start with.
 ```{r}
-review_text <- page %>%
-  html_elements(xpath = "//*[@data-hook='review-body']") %>%
-  html_text() %>%
-  str_trim() %>%
-  str_remove_all("<.*?>") %>%
-  str_replace_all("\\s+", " ")
+# Set parameters for scraping reviews
+n_reviews <- 100
+reviews_per_page <- 10
+iters <- ceiling(n_reviews/reviews_per_page)
 
-```
+# Set the base and additional URL parameters
+url_p1 <- "https://www.amazon.com/Apple-iPhone-11-128GB-Black/product-reviews/B07ZPKR714/ref=cm_cr_getr_d_paging_btm_"
+url_p2 <- "?ie=UTF8&reviewerType=all_reviews&pageNumber="
+url_p3 <- "&filterByStar="
 
-```{r}
-review_text <- page %>%
-  html_elements(".review-text-content") %>%
-  html_text() %>%
-  str_trim()
+filters <- c("five_star", "four_star", "three_star", "two_star", "one_star")
 
+# Initialize an empty data frame to store all reviews
+reviews_all <- data.frame(NULL)
+reviews_scraped <- data.frame(NULL)
 
-```
+# Set a seed for reproducibility
+set.seed(1479)
 
-
-## review head
-
-```{r}
-review_head <- page %>%
-  html_elements(xpath = "//*[@class='cr-original-review-content']") %>%
-  html_text() %>%
-  str_trim() %>%
-  str_remove_all("<.*?>") %>%
-  str_replace_all("\\s+", " ")
-print(review_head)
-```
-
-## create a dataframe:
-
-```{r}
-length(formatted_dates); length(review_text);length(star_ratings)
-reviews <- data.frame(formatted_dates, review_text, star_ratings)
-head(reviews)
-
-```
-
-## loop over pages
-
-```{r}
-url = "https://www.amazon.de/-/en/MPUF3ZD-A/product-reviews/B0BDJH7J5C/ref=cm_cr_getr_d_paging_btm_prev_1?ie=UTF8&reviewerType=all_reviews"
-
-reviews_all<-data.frame(NULL)
-for(i in c(1:10)){
-  url = "https://www.amazon.de/-/en/MPUF3ZD-A/product-reviews/B0BDJH7J5C/ref=cm_cr_getr_d_paging_btm_prev_1?ie=UTF8&reviewerType=all_reviews"
-  if (i == 1){
-    page<-read_html(url)}
-  else{
-    url<-paste0(url, '&pageNumber=', i)
-    print(url)
-    page <-read_html(url)
-    #page <-read_html(paste0(url,'pageNumber=', i))
+# Loop through the iterations to scrape reviews
+for (filter in filters) {
+  for (i in 1:iters) {
+    # Construct the URL for each iteration
+    url <- paste0(url_p1, ifelse(i == 1, "prev_1", paste0("next_", i)), url_p2, i, url_p3, filter)
+    
+    # Set custom headers to mimic a browser request
+    headers <- c(
+      'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+      'Accept' = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+      # Add more headers as needed
+    )
+    
+    # Make the request with custom headers
+    response <- httr::GET(url, httr::add_headers(.headers=headers))
+    
+    # Check if the request was successful (status code 200)
+    if (httr::status_code(response) == 200) {
+      # Read the HTML content of the page
+      page <- read_html(content(response, "text")) #page <- read_html(content(response, "text"))
+      
+      # Extract Body of 10 reviews per page
+      page <- page %>% html_elements(xpath = "/html/body/div[1]/div[2]/div/div[1]/div/div[1]/div[5]/div[3]/div")
+      
+      # Extract review information from the page
+      ## Review Title
+      review_title <- page %>%
+        html_elements(xpath = "//*[@data-hook='review-title']/span[2]") %>%
+        html_text() %>%
+        str_trim() %>%
+        str_remove_all("<.*?>") %>%
+        str_replace_all("\\s+", " ")
+      ## Review Text
+      review_text <- page %>%
+        html_elements(xpath = "//*[@data-hook='review-body']") %>%
+        html_text() %>%
+        str_trim() %>%
+        str_remove_all("<.*?>") %>%
+        str_replace_all("\\s+", " ")
+      ## Review Star Ratings
+      star_ratings <- page %>%
+        html_elements(xpath = "//*[@data-hook='review-star-rating']") %>%
+        html_text()
+      ## Review Dates
+      review_dates <- page %>%
+        html_elements(xpath = "//*[@data-hook='review-date']") %>%
+        html_text()
+      
+      ## Review Verified Purchase
+      reviews <- html_elements(page, xpath = "//*[@data-hook='review']")
+      review_verified <- data.frame(Verified = rep(FALSE, length(reviews)))
+      j <- 1
+      for (element in reviews)
+      {if (str_detect(str_squish(html_text(element)), fixed("Verified Purchase"))) {
+        review_verified[j, ] <- TRUE
+      }
+        j <- j+1}
+      
+      ## Review n-helpful
+      review_n_helpful <- data.frame(N_helpful = rep(NA, length(reviews)))
+      k <- 1
+      for (element in reviews) {
+        review_helpful <- element %>%
+          html_text()
+        
+        # Define the pattern to match
+        pattern <- "((?:\\d+|One) person|\\d+ people) found this helpful"
+        match_result <- str_match(review_helpful, pattern)
+        
+        if (!is.na(match_result[1, 2])) {
+          n_helpful <- match_result[1, 2]
+          
+          if (n_helpful == "One person") {
+            review_n_helpful[k, ] <- 1
+          } else {
+            pattern_2 <- "\\b\\d+\\b"
+            extracted_number <- str_extract(n_helpful, pattern_2)
+            review_n_helpful[k, ] <- as.numeric(extracted_number)
+          }
+        } 
+        
+        k <- k + 1
+      }
+      
+      # Use str_match on the vector review_dates
+      dates <- str_match(review_dates, "on ([[:alpha:]]+ [0-9]+, [0-9]+)")[, 2]
+      
+      # Convert the extracted dates to a standard date format
+      formatted_dates <- as.Date(dates, format = "%B %d, %Y", locale = "en")
+      
+      # Convert the star ratings to numeric
+      pattern_star <- "([0-9]+\\.[0-9]+) out of 5 stars"
+      match_result_star <- str_match(star_ratings, pattern_star)[, 2]
+      star_rating_num <- as.numeric(match_result_star)
+      
+      # Create a data frame with the extracted information
+      reviews_comb <- data.frame(review_title, review_text, formatted_dates, review_verified, review_n_helpful, star_rating_num)
+      
+      # Append reviews to the data frame
+      reviews_all <- rbind(reviews_all, reviews_comb)
+    } else {
+      # Print a warning if the request fails
+      warning(paste("Request failed with status code:", httr::status_code(response)))
+    }
+    reviews_scraped <- rbind(reviews_all)
+    # Add a random timeout to avoid being too aggressive
+    timeout <- runif(1, 5, 10)
+    Sys.sleep(timeout)
+    print(paste0(filter, " reviews: iteration ", i, "/", iters, " completed."))
   }
-  review_text <- page %>%
-    html_elements(xpath = "//*[@data-hook='review-body']") %>%
-    html_text() %>%
-    str_trim() %>%
-    str_remove_all("<.*?>") %>%
-    str_replace_all("\\s+", " ")
-  star_ratings <- page %>%
-  html_elements(xpath = "//*[@data-hook='review-star-rating']") %>%
-  html_text()
-  review_dates <- page %>%
-    html_elements(xpath = "//*[@data-hook='review-date']") %>%
-    html_text()
-  # Use str_match on the vector review_dates
-  dates <- str_match(review_dates, "on (\\d+\\s[A-Za-z]+\\s\\d{4})")[, 2]
-  # Convert the extracted dates to a standard date format
-  formatted_dates <- as.Date(dates, format = "%d %B %Y", locale = "de")
+}
 
-  reviews <- data.frame(formatted_dates, review_text, star_ratings)
-  print(reviews$formatted_dates)
-  reviews_all=rbind(reviews_all, reviews)
-print(page)
-  }
-
+save(reviews_scraped, file="Reviews_Scraped_500_v2.rda")
 ```
 
+Now let us take a look at the dataframe that we have created via the code chunk above and the structure that we are working with: 
+```{r}
+load("reviews_scraped_500_v2.rda")
+View(reviews_scraped)
+head(reviews_scraped)
+str(reviews_scraped)
+```
+
+Our dataframe consists of 100 observations (maximum number of reviews that can be scraped using our algorithm and not specific search words for Amazon) and 6 features. The features are the title of the review (character), the text of the review (character), the date the review was published (Date), whether it was a verified customer or not (TRUE / FALSE), the number of people that found it helpful and the number of stars the product was rated (both numeric). 
+
+In the following steps we will analyze these 100 reviews and their content.
+
+## General analysis
+We want to start by taking a look at some general features of our review data to get a better understanding of the reviews in general. 
+
+Let us start by taking a look at **when the reviews were made**:
+```{r}
+min(reviews_scraped$formatted_dates)
+max(reviews_scraped$formatted_dates)
+```
+The time frame of our reviews spans from 25th of February, 2023, when the first review was published until the 16th of November, where the most recent one was made. 
+
+Additionally, let's check who made the reviewers, or to be exact: **was the reviewer a verified buyer** or not? 
+```{r}
+table(reviews_scraped$Verified)
+```
+This reveals that all 100 reviews were made by verified buyers, thus we can neglect this column.
+
+What might be interesting is to have more of an insight into the **general rating behavior**. Since we have, already when scraping, turned the star rating into a numerical variable the following steps can be done quite easily:
+```{r}
+min(reviews_scraped$star_rating_num)
+mean(reviews_scraped$star_rating_num)
+max(reviews_scraped$star_rating_num)
+```
+The **worst rating** is 3 stars, the **highest one** is 5 stars and the **average rating** amounts to 4.57 stars. The star ratings indicate a very positive performance. 
+
+Another visualization of the **distribution of star ratings** might be helpful to see how the product has performed in general. Thus, here we present a histogram: 
+```{r}
+stars <- reviews_scraped$star_rating_num
+cols <- c("dark red", "red", "orange", "yellow", "green")
+hist(stars, main="Distribution of Star Ratings",xlab="stars", col=cols, breaks = 0:5)
+```
+This shows how the star ratings are distributed in a bit more detail. We can see that the vast majority of reviews gave 4 or 5 stars to the product.
+
+It might be also interesting to **reviews have changed over time**. 
+For this we first summarize months.
+```{r}
+dates <-strftime(reviews_scraped$formatted_dates, "%Y/%m")
+```
+
+Now we want to check whether the **average rating has improved or deteriorated** over time.
+```{r}
+#plot rating distribution across time
+plottingstars <- aggregate(reviews_scraped$star_rating_num ~ dates, FUN = mean)
+plot(plottingstars[,2],type="l" ,xlab="Date",xaxt="n",ylab="Average Rating"
+     ,main="Development of Average Star Ratings")
+axis(side=1,at=1:nrow(plottingstars)-0.5,labels=plottingcount[1:nrow(plottingstars),1])
+```
+It seems as the average rating improves already after the first reviews and stays relatively constant throughout the time period where reviews were published. 
+
+It might also be interesting to take a look at **the number of reviews published across our time period** and see if and how this corresponds to the development of the star ratings. 
+```{r}
+# plot number of reviews distribution across time
+plottingcount <- aggregate(reviews_scraped$star_rating_num ~ dates, FUN = length)
+barplot(plottingstars[,2], main="Number of reviews across time",xlab="Time",xaxt="n",
+        ylab="Number of reviews", space=0)
+axis(side=1,at=1:nrow(plottingcount)-0.5,labels=plottingcount[1:nrow(plottingcount),1])
+```
+It appears that in all time periods a somewhat equal amount of ratings has been published and never below 4.However there is an increasing tendency of the reviews. 
+
+When comparing the two plots we can see that overall the review-situation improved over time: Both more reviews and better reviews were published in November than for example in February or June. The dip in June might be interesting to analyze - especially to see if it remains so apparent when the dataset of reviews is larger.
+
+Furthermore, we might want to take a look at **helpfulness of the reviews**. For this we start off with simply wanting to know how the reviews were distribtued in this aspect.
+```{r}
+reviews_scraped$N_helpful[is.na(reviews_scraped$N_helpful)] <- 0
+min(reviews_scraped$N_helpful)
+mean(reviews_scraped$N_helpful)
+median(reviews_scraped$N_helpful)
+max(reviews_scraped$N_helpful)
+```
+We can see that the reviews were rated as helpful by between 0 and 50 people, with an average of 3.47 and a median of 0 as well. This indicates skewedness and strong outliers, so we want to take a closer look.
+```{r}
+helpful <- reviews_scraped$N_helpful
+cols <- c("dark red", "red", "orange", "yellow", "light yellow", "light green", "green", "dark green", "blue", "purple")
+hist(helpful, main="Distribution of Helpfulness",xlab="Number of people who found this review helpful", col=cols, breaks = seq(0, 55, by=5))
+```
+This supports our hypothesis that the vast majority of reviews are rated as non-helpful by very few to none people. Only very few people attained over 15 "helpfulness"-votes.
+
+This comes down to the following general helpfulness of reviews:
+```{r}
+dim(reviews_scraped[reviews_scraped$N_helpful>0,])[1]/dim(reviews_scraped)[1]
+```
+Overall a third of the reviews were perceived as helpful, meaning that at least 1 customer rated them as such.
+
+## Text Analysis
+Now that we have taken a look at the ratings and developments over time of our reviews, let us dive deeper into **what the reviews actually say**: 
+
+In order to do some text analysis, we must first do some pre-processing of the reviews. 
+
+Let us start by looking at **how long the review texts are**:
+```{r}
+reviews_scraped$review_text_2 <- reviews_scraped$review_text
+reviews_scraped$review_text_2 <-  gsub('[[:punct:] ]+',' ',reviews_scraped$review_text_2)
+#split into substrings 
+reviews_scraped$review_text_2 <-strsplit(reviews_scraped$review_text_2, " ")
+#count the number of strings = number of words
+reviews_scraped$review_length <- sapply(reviews_scraped$review_text_2, length)
+print(reviews_scraped$review_length)
+```
+
+Given this, we can for example now check the average length of reviews:
+```{r}
+mean(reviews_scraped$review_length)
+```
+We find out that the average review text is around 65 words long. 
+
+What might be more interesting is to see if there is some **correlation between the length of a reviews and its rating**:
+```{r}
+correlation <- cor(reviews_scraped$review_length, reviews_scraped$star_rating_num)
+correlation
+```
+The correlation is -0.271080. What this reveals is that long reviews tend to be more negative or that customers who have a negative opinion about a product tend to share more information to explain or complain. 
+
+Let's see if there is some **correlation between the length of a review and its helpfulness**:
+```{r}
+correlation <- cor(reviews_scraped$review_length, reviews_scraped$N_helpful)
+correlation
+```
+The correlation is at 0.7532371. This leads to the conclusion that longer reviews tend to be rated as more helpful as they for example share more information and details that can be useful for other potential customers. 
+
+Now let us dive even deeper into text analysis than merely the word count. Let's have a look at **what people actually write in their reviews**. 
+```{r}
+# we start by loading in our text data as a "corpus"
+TextDoc <-  Corpus(VectorSource((reviews_scraped$review_text_2)))
+
+#Replacing "/", "@" and "|" with space
+toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+TextDoc <- tm_map(TextDoc, toSpace, "/")
+TextDoc <- tm_map(TextDoc, toSpace, "@")
+TextDoc <- tm_map(TextDoc, toSpace, "\\|")
+# Convert the text to lower case
+TextDoc <- tm_map(TextDoc, content_transformer(tolower))
+# Remove numbers
+TextDoc <- tm_map(TextDoc, removeNumbers)
+# Eliminate extra white spaces
+TextDoc <- tm_map(TextDoc, stripWhitespace)
+# Remove English common stopwords
+TextDoc <- tm_map(TextDoc, removeWords, stopwords("english"))
+# Text stemming - which reduces words to their root form
+TextDoc <- tm_map(TextDoc, stemDocument)
+# Remove all punctuation
+TextDoc <- tm_map(TextDoc, removePunctuation)
 
 
-# try it for yelp and see if it works (in principal):
+# we continue to now build a term-document matrix
+TextDoc_tdm <- TermDocumentMatrix(TextDoc)
+tdm_m <- as.matrix(TextDoc_tdm)
+# we sort the terms by decreasing frequency
+tdm_v <- sort(rowSums(tdm_m),decreasing=TRUE)
+tdm_d <- data.frame(word = names(tdm_v),freq=tdm_v)
+
+# with these steps accomplished we can now build a word cloud
+set.seed(1234)
+wordcloud(words = tdm_d$word, freq = tdm_d$freq, min.freq = 5,
+          max.words=100, random.order=FALSE, rot.per=0.40, 
+          colors=brewer.pal(8, "Dark2"))
+```
+
+Words such as "iphone", "phone" or "apple" do not surprise us as being frequently used since they refer to product name and brand. If we want to make room for new revelations, we can remove them.
+
+Therefore we will make further alterations to remove chosen words such as the product name itself - this wors via custom stop words: 
+```{r}
+# specify your custom stopwords as a character vector
+TextDoc <- tm_map(TextDoc, removeWords, c("iphone","phone","apple")) 
+
+# Build a term-document matrix
+TextDoc_tdm <- TermDocumentMatrix(TextDoc)
+tdm_m <- as.matrix(TextDoc_tdm)
+# Sort by decreasing value of frequency
+tdm_v <- sort(rowSums(tdm_m),decreasing=TRUE)
+tdm_d <- data.frame(word = names(tdm_v),freq=tdm_v)
+
+#generate word cloud
+set.seed(1234)
+wordcloud(words = tdm_d$word, freq = tdm_d$freq, min.freq = 5,
+          max.words=200, random.order=FALSE, rot.per=0.40, 
+          colors=brewer.pal(8, "Dark2"))
+```
+This reveals a much more interesting picture. We chose that all terms that are mentioned at least 5 times in the 100 reviews are shown in the word cloud. The by far biggest and thus most frequently used significant term in reviews is "battery". Additionally screen and scratches as well as condition might be interesting ones to dive into.
+
+Let us now do the same for the titles of the reviews and see if there are differences:
+```{r}
+# we start by loading in our text data as a "corpus"
+TextDoc <-  Corpus(VectorSource((reviews_scraped$review_title)))
+
+#Replacing "/", "@" and "|" with space
+toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+TextDoc <- tm_map(TextDoc, toSpace, "/")
+TextDoc <- tm_map(TextDoc, toSpace, "@")
+TextDoc <- tm_map(TextDoc, toSpace, "\\|")
+# Convert the text to lower case
+TextDoc <- tm_map(TextDoc, content_transformer(tolower))
+# Remove numbers
+TextDoc <- tm_map(TextDoc, removeNumbers)
+# Eliminate extra white spaces
+TextDoc <- tm_map(TextDoc, stripWhitespace)
+# Remove german common stopwords
+TextDoc <- tm_map(TextDoc, removeWords, stopwords("english"))
+# Text stemming - which reduces words to their root form
+TextDoc <- tm_map(TextDoc, stemDocument)
+# Remove all punctuation
+TextDoc <- tm_map(TextDoc, removePunctuation)
+# specify your custom stopwords as a character vector
+TextDoc <- tm_map(TextDoc, removeWords, c("iphone","phone","apple")) 
+
+# Build a term-document matrix
+TextDoc_tdm <- TermDocumentMatrix(TextDoc)
+tdm_m <- as.matrix(TextDoc_tdm)
+# Sort by decreasing value of frequency
+tdm_v <- sort(rowSums(tdm_m),decreasing=TRUE)
+tdm_d <- data.frame(word = names(tdm_v),freq=tdm_v)
+
+# with these steps accomplished we can now build a word cloud
+set.seed(1234)
+wordcloud(words = tdm_d$word, freq = tdm_d$freq, min.freq = 2,
+          max.words=100, random.order=FALSE, rot.per=0.40, 
+          colors=brewer.pal(8, "Dark2"))
+```
+Since this word cloud is less informative, we will include more words (at lower frequency threshold)  and see an overwhelming frequency of very positive terms (good, grate, perfect). This is a positive indicator.
+
+## Sentiment analysis 
+Before we dive into applying sentiment analysis on our dataset of reviews, we tried to recall the basics of the Sentiment package and its meaning in R. 
+Essentially sentiment analysis works by differentiating between words depending on the sentiment that is attached to them. This is conducted via dictionaries consisting of lists of positive vs. negative words, or lists of more diverse emotions. 
+Packages such as sentimentr in R work by scanning the text to see if words in the text match with any dictionary entries. The words are then assigned a value (>0 if the word is located on the positive list, <0 if it is on the negative one) - all values are added together and the average sentiment is determined. Important note: The packages to take the words before and after a term into account in order to assess its classification. This way valence shifters or negations can be included. 
+Sentiment analysis can be applied in a number of fields and situations. Its use-cases range from social media monitoring, political campaigns, PR and market research.
+
+We now want to start our first computations in the field of sentiment analysis to get a better picture about the general tonality and sentiment of the reviews we are examining. 
+In this we will differentiate between title and text look at the correlation between them and their general behavior. 
+```{r}
+sentences <- get_sentences(reviews_scraped$review_text)
+reviews_scraped$sentiment_text=sentiment_by(sentences)
+
+sentences_title <- get_sentences(reviews_scraped$review_title)
+reviews_scraped$sentiment_title=sentiment_by(sentences_title)
+
+summary(cbind(reviews_scraped$sentiment_text$ave_sentiment,reviews_scraped$sentiment_title$ave_sentiment))
+
+cor.test(reviews_scraped$sentiment_text$ave_sentiment, reviews_scraped$sentiment_title$ave_sentiment)
+```
+The computations reveal that in the review texts, sentiment ranges from -0.45 to 1.05 and averages at around 0.25. For the titles, the lowest sentiment is -0.6, the highest is 1.24 and the average is around 0.35. Both average sentiments are positive, which is good news for the product. Anything else would be highly unusual since the sentiment should correspond to star ratings and since there are no significant bad ratings, this would need further investigation. 
+Simply comparing the numbers allows us to make the inference that in general the sentiment in titles is more extreme than that in texts. This should not surprise us - titles are meant to catch people's attentions and thus, similar as headlines in the news, use more aggressive wordings, stronger opinions and more catchy phrases. 
+We also prove that the sentiment of title and review text are correlated since the p-value is extremely low. 
+
+Now, similar to the way we wanted to check if the rating behavior changed over time we want to take a look at the **development of sentiment over time**: 
+```{r}
+textsentiment_agg<-aggregate(reviews_scraped$sentiment_text$ave_sentiment ~ dates, FUN = mean)
+titlesentiment_agg<-aggregate(reviews_scraped$sentiment_title$ave_sentiment ~ dates, FUN = mean)
+starratings_agg<-aggregate(reviews_scraped$star_rating_num ~ dates, FUN = mean)
+
+par(mfrow=c(1,2))
+plot(textsentiment_agg[,2],type="l" ,xlab="Time",xaxt="n",ylab="Sentiment Polarity", ylim=c(-0.5, 0.8),
+     main="Sentiment across time",col="light blue")
+lines(titlesentiment_agg[,2],type="l" ,xlab="Time",xaxt="n",ylab="Sentiment Polarity"
+      ,main="Sentiment across time",col="purple")
+axis(side=1,at=1:nrow(textsentiment_agg),labels=textsentiment_agg[1:nrow(textsentiment_agg),1])
+legend("bottomright",c("text","title"),fill=c("light blue","purple"))
+
+plot(starratings_agg[,2],type="l" ,xlab="Time",xaxt="n",ylab="Average rating"
+     ,main="Average rating across time")
+axis(side=1,at=1:nrow(starratings_agg),labels=starratings_agg[1:nrow(starratings_agg),1])
+legend("bottomright","rating",fill="black")
+```
+When comparing the plots of how sentiment (in both title and text) developed, we can see the same drop between title sentiment and ratings in June 2023. Additionally the stabilization of sentiment / slight improvement is mirrored in an increase in the average ratings. 
+
+We can take a look at how sentiment & other variables interact in more detail: 
+```{r}
+corrm <- cor(cbind(reviews_scraped$sentiment_text$ave_sentiment,reviews_scraped$sentiment_title$ave_sentiment,reviews_scraped$review_length, reviews_scraped$star_rating_num))
+colnames(corrm) <- c("sentiment_text","sentiment_title","text_length", "star_ratings")
+rownames(corrm) <- c("sentiment_text","sentiment_title","text_length", "star_ratings")
+corPlot(corrm ,numbers=T,diag=T,upper=F,  main="Correlations between variables", xact = "n")
+```
+From the correlation plot we can see a rather strong positive correlation between sentiment in title and sentiment in text - this we have already found out. Additionally we can see slight negative correlations between text length and sentiment. This further supports our findings that longer reviews will have a worse rating. Star ratings thus negatively correlate with text length, but are positively impacted by the sentiment score. 
+
+## Emotion Analysis
+In emotion analysis we get more detailed insights in the emotions that are expressed in reviews by differentiating not only between positively and negatively annotated terms, but a more developed spectrum of emotions. 
+As a basis, Plutchik's wheel of emotion is used. 
+![Wheel of Emotion](/Users/carolinemeyer/Desktop/Sem V/1479 (Applications of Data Science) /Wheel of Emotions image.webp)
+
+We now want to find out about the emotions in our reviews:
+```{r}
+text_emotions <- emotion_by(sentences)
+emotiontext_agg<-aggregate(text_emotions$ave_emotion ~ (text_emotions$emotion_type), FUN = mean)
+emotiontext_agg <- subset(emotiontext_agg,(1:dim(emotiontext_agg)[1])%%2==1) #look at non-negated only
+plot(emotiontext_agg,xaxt="n", ylab="Degree of avg. emotion",xlab="Emotions",main="Wheel of Emotions for Review Texts")
+axis(side=1,at=row.names(emotiontext_agg),labels=emotiontext_agg[c(1:8),1])
+colors = c("red", "orange", "purple", "dark green", "yellow", "blue", "turquoise", "light green")
+barplot(emotiontext_agg[, 2], names.arg = emotiontext_agg[, 1], col = colors, main="Emotion Analysis for Review Texts", ylim=c(0, 0.04), xlab="Emotion", ylab = "Average Prevalence of Emotion")
+```
+Essentially, this plot reveals information about how dominant certain emotions are in our review text. The higher the bar of a certain emotion, the higher its relevance. In the colored bar plot visualizations we can see which emotions correspond to which part of the wheel and can infer that the most dominant emotions in the review texts are anticipation (orange), joy (yellow) and trust (light green). However, there are significant degrees of anger as well.
+
+Now let us take a closer look at the emotions separately: i
+```{r}
+#add emotions to data set
+#reduce to non-negated emotions
+text_emotions_nnegated <- text_emotions[-grep("negated",text_emotions$emotion_type),]
+
+#get average emotions for each review
+temp <- reshape(text_emotions_nnegated[,c(1,2,6)], idvar = "element_id", timevar = "emotion_type", v.names = "ave_emotion",  direction = "wide")
+reviews_scraped <- cbind(reviews_scraped,temp)
+emotions_list <- c("ave_emotion.anger", "ave_emotion.anticipation", "ave_emotion.disgust", "ave_emotion.fear", "ave_emotion.joy", "ave_emotion.sadness", "ave_emotion.surprise", "ave_emotion.trust")
+summary(reviews_scraped[,emotions_list])
+```
+Here we can see that the minimum of all emotions is 0 (every review features every emotion to at least some extent).
+Surprise reaches up to 0.125 and averages average at 0.013. Trust has a maximum of 0.2 and averages at 0.03. Anger has a maximum of 0.18 and averages at 0.115. Anticipation has a maximum of 0.2 and averages at 0.03. Disgust has a maximum of 0.07 and averages at 0.002. Feat has a maximum of 0.05 and averages at 0.003 and joy has a maximum of 0.2 and an average of 0.03. 
+This again shows that trust, anticipation and joy have the highest means, thus are on average the prevalent emotions expressed in the reviews we are looking at.
+
+
+Now we want to check if and how emotional categories are potentially related to one another:
+```{r}
+corrE <- cor(reviews_scraped[,emotions_list])
+colnames(corrE) <- c("anger","anticipation","disgust","fear","joy","sadness","surprise","trust")
+rownames(corrE) <-c("anger","anticipation","disgust","fear","joy","sadness","surprise","trust")
+
+corPlot(corrE ,numbers=T,diag=F,upper=F,  main="Correlations between emotions" ,xact="n" )
+```
+The correlation matrix provides us with information about how the different emotions might go hand in hand with another in the reviews we are examining. This reveals high positive correlation of anger with anticipation, joy and trust; of ancticipation with joy and trust; and of joy with trust. Negative correlations are less extreme but can be found between feat and disgust and feat and surprise. 
+
+Let us now also check if our emotions are similar between text and title: 
+```{r}
+title_emotions <- emotion_by(sentences_title)
+emotiontitle_agg<-aggregate(title_emotions$ave_emotion ~ (title_emotions$emotion_type), FUN = mean)
+
+emotiontitle_agg <- subset(emotiontitle_agg,(1:dim(emotiontitle_agg)[1])%%2==1)
+
+par(mfrow=c(1,2))
+plot(emotiontext_agg,xaxt="n",ylab="Word count",xlab="Emotions",main="Emotions for the Review text",
+      ylim=c(0,0.1))
+axis(side=1,at=row.names(emotiontext_agg),labels=emotiontext_agg[c(1:8),1])
+plot(emotiontitle_agg,xaxt="n",ylab="Word count",xlab="Emotions",main="Emotions of Review title",
+     ylim=c(0,0.1))
+axis(side=1,at=row.names(emotiontitle_agg),labels=emotiontitle_agg[c(1:8),1])
+```
+We can see that for anticipation and joy there are much higher values in the graph representing the emotions of the title, while trust is less prominent there. This means that the titles express disproportionate amounts of joy and anticipation. 
+
+## Topic Analysis
+Now that we have talked about the sentiments and emotions prevalent in the reviews of the product, we want to take a look at the content of the reviews. To do this efficiently, we will make use of the methods of Topic Analysis. 
+
+topic Analysis refers to methods that aim to identify the different contents dicussed and help us focus on those that we are really interested in. It functions via LDA: after pre-processing, a document term matrix is created, the number of topics to differentiate between is decided upon, we check for convergence, estimate the model & can then interpret the first conclusion.
 
 ```{r}
-url = "https://www.yelp.at/biz/caf%C3%A9-central-wien-4"
-page <-read_html(url)
+# already pre-processed in steps for creating the wordcloud
+DocText_dtm <- DocumentTermMatrix(TextDoc)
 
-page %>% 
-    html_nodes(xpath = "//*[@class=' raw__09f24__T4Ezm']") %>%
-    html_text()
+# first steps
+raw.sum<- apply(DocText_dtm,1,FUN=sum) 
+DocText_dtm <- DocText_dtm[raw.sum!=0,]
+DocText_dtm
 ```
+
+One of the trickiest part of topic analysis is deciding upon the right number of topics to distinguish between. To compute the optimal number, we will run the following code:
+```{r}
+SEED <- 123
+burnin <- 5000 #not being used for estimation
+iter <- 20000  #number of iterations after burn in
+keep <- 10  #keeps every tenth iteration (=burin + iter)
+maxtops <- 10
+avg_result_fin <- matrix(nrow=maxtops-1,ncol=3) 
+counter <- 1
+par(mfrow=c(3,3))
+for (k in 2:maxtops){
+  
+ fitted_LDA <- LDA(DocText_dtm, k = k, method = "Gibbs",
+                    control = list(seed = SEED,burnin = burnin, iter = iter, keep = keep) )
+ plot(fitted_LDA@logLiks,type="l", main=paste0(c("kindle",k),collapse=""))
+ words_LDA <- dim(posterior(fitted_LDA)[[1]])[2]
+ avg_result_fin[counter,] <- cbind(k, logLik(fitted_LDA),-2*logLik(fitted_LDA)+(k+k*words_LDA))
+ counter=counter+1
+}
+```
+This for loop iterates and finds the best number of topics for our dataset. 
 
 ```{r}
-url = "https://www.yelp.at/biz/caf%C3%A9-central-wien-4?start=10"
-page <-read_html(url)
-
-page %>% 
-    html_nodes(xpath = "//*[@class=' raw__09f24__T4Ezm']") %>%
-    html_text()
+colnames(avg_result_fin) <- c("ntopics","ll","AIC")
+avg_result_fin
 ```
+To take a final decision about the number of plots it can be helpful to plot the AIC values for different numbers of topics. We want to minimize AIC and thus choose only 1 topic 
+
+## Modeling approaches
+In the following we will attempt to model the ratings of our product using different features that we have derived in the previous chapters. 
+
+Modeling ratings based on **date**:
+```{r}
+stars_1 <- lm(star_rating_num ~  as.factor(strftime(formatted_dates, "%m")), data=reviews_scraped)
+summary(stars_1)
+```
+This model takes a look at the star ratings as a function of time. We use the months as factor variables with 02 - February representing our baseline. However, we find that no date-parameter has a sufficiently low p-value to be considered significant. 
+
+Modeling ratings based on **review length**:
+```{r}
+stars_2 <- lm(star_rating_num ~ review_length, data=reviews_scraped)
+summary(stars_2)
+```
+This model takes a look at how the review length impacts the star ratings in closer detail. We find out that actually, the review length does have a significant impact in determining the stars given in a review. This relationship is negative, meaning: the longer a review, the lower the average star rating. 
+
+Modeling ratings based on **sentiment**:
+```{r}
+stars_3 <- lm((star_rating_num) ~ (sentiment_title$ave_sentiment) + (sentiment_text$ave_sentiment)
+              + (review_length) 
+               ,    data=reviews_scraped)
+summary(stars_3)
+```
+This model now includes the sentiment of the title of the review and of the review itself as well as the length of the review as determining parameters for the expected star rating. In the case of this model, the sentiment of title as well as the review length are considered to be significant. While a higher sentiment of the title will lead to an increase in the predicted star rating, a higher word count of the review will lead to a decrease in the predicted star rating. We also tested for a model only using sentiment, not review length - here too, only the sentiment of the title resulted in being statistically significant at alpha=0.05. 
+
+Modeling ratings based on **emotions**: 
+```{r}
+stars_4 <- lm((star_rating_num ~ ave_emotion.anger+ave_emotion.anticipation + ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy +ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + (review_length)) 
+              ,    data=reviews_scraped)
+summary(stars_4)
+```
+This model reveals that stars are only significantly impacted by review length, not however by any of the emotion categories. 
+
+Modeling ratings based on **sentiments & emotion**: 
+```{r}
+stars_5 <- lm((star_rating_num ~ ave_emotion.anger+ave_emotion.anticipation + ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy +ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + (sentiment_title$ave_sentiment) + (sentiment_text$ave_sentiment)+review_length) 
+              ,    data=reviews_scraped)
+summary(stars_5)
+```
+When modeling star ratings based on emotions, sentiments & review_length we find out that the emotion surprise, the sentiment of the title and the word count of the review have a significant impact in determining the final rating. Surprise and long reviews go hand in hand with lower ratings, while positive title sentiment is associated with higher ratings. The other emotion categories remain insignificant. 
+
+We can try a full model for determining if the rating will have 5 stars: 
+```{r}
+stars_6 <- glm((star_rating_num) > 4 ~ (ave_emotion.anger+ave_emotion.anticipation + ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy +ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + sentiment_title$ave_sentiment + sentiment_text$ave_sentiment+review_length)
+              ,    data=reviews_scraped, family = "binomial")
+summary(stars_6)
+```
+
+When combining all features in a model, only the average sentiment of the review title remains significant in determining whether the rating will be 5 stars. 
+
+Building a conclusive model for helfpulness:
+```{r}
+help <- glm((N_helpful) > 10 ~ (ave_emotion.anger+ave_emotion.anticipation + ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy +ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + sentiment_title$ave_sentiment + sentiment_text$ave_sentiment+review_length)
+              ,    data=reviews_scraped, family = "binomial")
+summary(help)
+```
+This model to determine if a review will be voted as helpful by more than 10 people shows that only the review_length, not the emotion or sentiment of the review is significant in shaping the outcome. 
+
+
+
+
+

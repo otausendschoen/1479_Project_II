@@ -93,6 +93,9 @@ Furthermore, we might want to take a look at **helpfulness of the reviews**. For
 
 The appendix contains the technical analysis of the available data, including all the corresponding R-code. For the analysis we used the following R-packages:
 
+# Scraping the data
+
+To scrape reviews which we can then analyze we start by installing necessary / helpful packages:
 ```{r}
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(rvest,
@@ -253,7 +256,7 @@ for (filter in filters) {
   }
 }
 
-save(reviews_scraped, file="Reviews_Scraped_500_v2.rda")
+#save(reviews_scraped, file="Reviews_Scraped_500_v2.rda")
 ```
 
 Now let us take a look at the dataframe that we have created via the code chunk above and the structure that we are working with: 
@@ -629,7 +632,7 @@ for (k in 2:maxtops){
   
  fitted_LDA <- LDA(DocText_dtm, k = k, method = "Gibbs",
                     control = list(seed = SEED,burnin = burnin, iter = iter, keep = keep) )
- plot(fitted_LDA@logLiks,type="l", main=paste0(c("kindle",k),collapse=""))
+ plot(fitted_LDA@logLiks,type="l", main=paste0(c("iPhone",k),collapse=""))
  words_LDA <- dim(posterior(fitted_LDA)[[1]])[2]
  avg_result_fin[counter,] <- cbind(k, logLik(fitted_LDA),-2*logLik(fitted_LDA)+(k+k*words_LDA))
  counter=counter+1
@@ -641,7 +644,46 @@ This for loop iterates and finds the best number of topics for our dataset.
 colnames(avg_result_fin) <- c("ntopics","ll","AIC")
 avg_result_fin
 ```
-To take a final decision about the number of plots it can be helpful to plot the AIC values for different numbers of topics. We want to minimize AIC and thus choose only 1 topic 
+
+We make our decision on the number of topics based on AIC. We want to minimize AIC and thus choose 3 topics.
+
+As the next step, we estimate our topic model.
+```{r}
+ktop <- 3
+
+fitted_LDA_model <- LDA(DocText_dtm, k = ktop, method = "Gibbs",
+                           control = list(seed = SEED,burnin = burnin, iter = iter, keep = keep) )
+```
+
+From our model, we extract the topics.
+```{r}
+topics <- posterior(fitted_LDA_model)[[1]]
+```
+Afterwards we look at the ten most important words for each topic in orther to get a grasp on what the topics are about.
+```{r}
+#look at the ten most important words for the topics
+for (k in 1:ktop){
+  print(sort(topics[k,],decreasing=T)[1:10])
+}
+```
+We label topic 1 as **quality**, topic 2 as **battery** due to the high proportion of comments mentioning it, and topic 2 as **value**, since the product we are analysing is refurbished, and the reviews mention words like condition, worth, seller and price.
+
+Next we create the dataframe multi, which shows the relative importance of the three topics for each review.
+```{r}
+multi <- posterior(fitted_LDA_model)[[2]]
+dim(multi)
+colnames(multi) <- c("quality", "battery", "value")
+summary(multi)
+```
+We plot the average imortance of the topics.
+```{r}
+plot(colSums(multi)/dim(multi)[1],type="h", main="Topic importances",ylim=c(0,.4),ylab="relative importance",xlab="topics",xaxt="n",lwd=10,col=2:4)
+axis(side=1,at=1:3,labels=colnames(multi))
+```
+From the plot above we can observe that the relative importance per review of each topic is about the same (a third), meaning the three topics are of equal importance in the reviews. Looking back on the summary statistics above, we can also see that the minimum importances of all topics are just under 0.3, and the maxima for all three are below 0.4, which implies that all of our reviews include all three topics relatively evenly.
+
+It is worth to note however, that since we are working with a limited amount of data (488 reviews), it can easily be the case that we simply do not have enough data to clearly identify topics.
+
 
 ## Modeling approaches
 In the following we will attempt to model the ratings of our product using different features that we have derived in the previous chapters. 
@@ -701,7 +743,6 @@ help <- glm((N_helpful) > 10 ~ (ave_emotion.anger+ave_emotion.anticipation + ave
 summary(help)
 ```
 This model to determine if a review will be voted as helpful by more than 10 people shows that only the review_length, not the emotion or sentiment of the review is significant in shaping the outcome. 
-
 
 
 

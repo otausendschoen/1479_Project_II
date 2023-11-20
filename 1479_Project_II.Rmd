@@ -83,7 +83,61 @@ We can see a bit of seasonality in this plot but mainly, there is an increasing 
 
 When comparing the two plots we can see that overall the review-situation improved over time: Both more reviews and better reviews were published in long term. The dip in June might be interesting to analyze - especially to see if it remains so apparent when the dataset of reviews is larger and less restricted.
 
-Furthermore, we might want to take a look at **helpfulness of the reviews**. For this we start off with simply wanting to know how the reviews were distribtued in this aspect.
+Furthermore, we might want to take a look at **helpfulness of the reviews**. 
+We can see that the reviews were rated as helpful by between 0 and 50 people, with an average of 3.47 and a median of 0 as well. This indicates skewedness and strong outliers, so we want to take a closer look:
+![Distribution_of_helpfulness](media/Distribution_of_helpfulness.png)
+
+
+
+This supports our hypothesis that the vast majority of reviews are rated as non-helpful by very few to none people. Only very few people attained over 15 "helpfulness"-votes. We can see the "Winner takes it all" principle.
+Overall a third of the reviews were perceived as helpful, meaning that at least 1 customer rated them as such.
+
+## Text Analysis
+
+This section focuses on text analysis, aiming to uncover patterns, relationships, and insights embedded in the textual feedback provided by customers.
+
+To kick off our text analysis, we start by taking a look at review length. We can see that the average length of a review in our dataset is about 70 word. But what might be more interesting is the **correlation between the length of a reviews and its rating.
+The correlation is about -0.3 What this reveals is that long reviews tend to be more negative or that customers who have a negative opinion about a product tend to share more information to explain or complain. 
+
+**correlation between the length of a review and its helpfulness
+The correlation is at about 0.63 This leads to the conclusion that longer reviews tend to be rated as more helpful as they for example share more information and details that can be useful for other potential customers. 
+
+Now let us dive even deeper into text analysis than merely the word count. Let's have a look at **what people actually write in their reviews**. To do this, we cleaned the reviews by removing special characters, nubers, punctuation, extra white spaces, common stopwords and reduced all words to their stem. After unsurprisingly seeing words like Phone, iphone, apple as the most frequent, we removed these and contructed the following wordcloud:
+
+![Wordcloud](media/Wordcloud.png)
+This reveals a much more interesting picture. We chose that all terms that are mentioned at least 5 times in the 100 reviews are shown in the word cloud. The by far biggest and thus most frequently used significant term in reviews is "battery". Additionally screen and scratches as well as condition might be interesting ones to dive into.
+
+Let us now do the same for the titles of the reviews and see if there are differences:
+![Wordcloud](media/Wordcloud_title.png)
+
+Since this word cloud is less informative, we will include more words (at lower frequency threshold)  and see an overwhelming frequency of very positive terms (good, grate, perfect). This is a positive indicator.
+
+## Sentiment analysis 
+
+Before we dive into applying sentiment analysis on our dataset of reviews, we tried to recall the basics of the Sentiment package and its meaning in R. 
+Essentially sentiment analysis works by differentiating between words depending on the sentiment that is attached to them. This is conducted via dictionaries consisting of lists of positive vs. negative words, or lists of more diverse emotions. 
+Packages such as sentimentr in R work by scanning the text to see if words in the text match with any dictionary entries. The words are then assigned a value (>0 if the word is located on the positive list, <0 if it is on the negative one) - all values are added together and the average sentiment is determined. Important note: The packages to take the words before and after a term into account in order to assess its classification. This way valence shifters or negations can be included. 
+Sentiment analysis can be applied in a number of fields and situations. Its use-cases range from social media monitoring, political campaigns, PR and market research.
+
+We now want to start our first computations in the field of sentiment analysis to get a better picture about the general tonality and sentiment of the reviews we are examining. 
+In this we will differentiate between title and text look at the correlation between them and their general behavior.
+
+The computations reveal that in the review texts, sentiment ranges from -0.54 to 1.42 and averages at around 0.25. For the titles, the lowest sentiment is -1.44, the highest is 1.23 and the average is around 0.35. Both average sentiments are positive, which is good news for the product. Anything else would be highly unusual since the sentiment should correspond to star ratings and since there are no significant bad ratings, this would need further investigation. We also prove that the sentiment of title and review text are correlated since the p-value is extremely low. 
+
+Now, similar to the way we wanted to check if the rating behavior changed over time we want to take a look at the **development of sentiment over time**: 
+
+![Sentiments](media/Average_sentiment_time.png)
+
+
+When comparing the plots of how sentiment (in both title and text) developed, we can see a clear correlation with average rating. This is good to see as it confirms that users who put a better rating put more positive emotions into the review.
+
+Let us now analyse how sentiment & other variables interact in more detail: 
+![Corplot](media/corplot.png)
+
+
+In this correlation plot/matrix we can see a rather strong positive correlation between sentiment in title and sentiment in text - this we have already found out. Additionally we can see slight negative correlations between text length and sentiment. This further supports our findings that longer reviews will have a worse rating. Star ratings thus negatively correlate with text length, but are positively impacted by the sentiment score. All in all, we are glad to see this as it confirms our previous assumptions.
+
+## Emotion Analysis
 
 
 

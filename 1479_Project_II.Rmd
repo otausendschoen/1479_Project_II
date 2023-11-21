@@ -258,6 +258,26 @@ Afterwards, we used logistic regression models to predict whether a review give 
 
 For the prediction of whether at least 10 people will find a review helpful, only review length showed to be significant. As opposed to the ratings, sentiment score did not hold predictive power.
 
+## Summary
+
+Overall, this report presents a comprehensive analysis of customer reviews for a selected product on Amazon.com, with the  focus of extracting valuable insights to help the brand achieving high star ratings to staisfy customers. The chosen dataset consists of 500 text-based reviews, collected through web scraping and filtering for different star ratings.
+
+Altough getting into challenges and not being able to scrape the entire product page, we managed to carefully analyzed a big variety of reviews with mixed emotions, topics and ratings. 
+On a general level, we found out the following:
+- Reviews span from June 6, 2020, to November 17, 2023, showing a long-time perspective.
+- Average star rating is 3, with a histogram showing an equal distribution due to the web scraping method.
+- Improvement in average rating over time, with an increase in both the number and quality of reviews.
+- Seasonality observed in the number of reviews, with an overall increasing trend
+
+In regard to text analysis, we saw that the term "battery" is used most frequently, indicating that people talk about this often, making it crucial for the company to adress various batter related topics. 
+A Sentiment analysis shows positive sentiments in both titles and review texts. These have a correlation to star ratings.Emotion analysis identifies dominant emotions as anticipation, joy, trust, anger, and surprise.
+
+We also employed a Latent Dirichlet Allocation (LDA) to identify three topics: Quality, Hardware, and Value.
+All topics are evenly present in reviews, but not significant predictors for star ratings. Similarly to the most frequently used terms, this shows what the company should focus as these topics are highly discussed in the reviews.
+
+Finally, we applied linear regression using predictors such as date, review length, sentiment, and emotions to predict star rating. We decided to use sentiment scores and review length as predictors as these give us the best model fit to predict star ratings.
+
+
 
 
 \newpage

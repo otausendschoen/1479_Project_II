@@ -247,10 +247,10 @@ Afterwards, we found that a higher sentiment score of both the review text and t
 
 Next, we looked at emotion: out of the eight emotions, only joy and disgust deemed significant, unsurprisingly with the former having a positive and the latter having a negative effect on ratings. However, with the combination of sentiment scores and emotions, both the title and text sentiments were significant, but none of the emotions. 
 
-Adding back dates to the previous model, we find that none of them are significant. We therefore arrived at the conclusion that the best combination of predictors to use are the sentiment scores and review length. To validate this claim, we looked at AIC scores and found that this model had the lowest value.
+Adding back dates to the previous model, we find that none of them are significant. We therefore arrived at the conclusion that the best combination of predictors to use are the sentiment scores and review length. To validate this claim, we looked at AIC scores and found that this model had the lowest value. Out of the ones created.
 
-The summary of the model:
-![Best linear model](media/star_3.png)
+However, with stepwise variable selection we could slightly reduce AIC further. This model added the emotions of anticipation, fear and joy to our simplified model. Our model of choice therefore:
+![Best linear model](media/star_step.png)
 
 #### Other models
 
@@ -275,7 +275,7 @@ A Sentiment analysis shows positive sentiments in both titles and review texts. 
 We also employed a Latent Dirichlet Allocation (LDA) to identify three topics: Quality, Hardware, and Value.
 All topics are evenly present in reviews, but not significant predictors for star ratings. Similarly to the most frequently used terms, this shows what the company should focus as these topics are highly discussed in the reviews.
 
-Finally, we applied linear regression using predictors such as date, review length, sentiment, and emotions to predict star rating. We decided to use sentiment scores and review length as predictors as these give us the best model fit to predict star ratings.
+Finally, we applied linear regression using predictors such as date, review length, sentiment, and emotions to predict star rating. We decided to use sentiment scores, review length as well as anticipation, fear and joy as predictors as these give us the best model fit to predict star ratings.
 
 
 
@@ -1041,6 +1041,12 @@ summary(stars_5a)
 ```
 With the inclusion of dates the significant predictors remain unchanged: sentiment scores and review length.
 
+```{r}
+stars_step <- step(stars_5a)
+summary(stars_step)
+```
+
+
 We pick our best model using AIC:
 ```{r}
 AIC(stars_1)
@@ -1049,8 +1055,10 @@ AIC(stars_3)
 AIC(stars_4)
 AIC(stars_5)
 AIC(stars_5a)
+AIC(stars_step)
 ```
-stars_3 has the lowest score, indicating the best model only uses sentiments and review length.
+stars_3 has the lowest score outside the one with stepwise selection, which only uses sentiments and review length. stars_step includes anticipation, fear and joy as well, further lowering the AIC by a slight amount.
+
 
 
 We do model for determining if the rating will have 5 stars:

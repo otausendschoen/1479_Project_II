@@ -233,7 +233,11 @@ However, one must critically note that this could also be the case due to the da
 
 ## Modeling approaches
 
-After conducting the above analyses, we move on to modeling the star ratings of our product using different features that we have derived in the previous chapters, using either linear or logistic regression, the former for the prediction of the ratings and the latter for predicting whether a rating will be five stars. Our aim with the modeling is to better understand which factors are a significant predictor of ratings.
+After conducting the above analyses, we move on to modeling the star ratings of our product using different features that we have derived in the previous chapters. Our aim with the modeling is to better understand which factors are a significant predictor of ratings.
+
+#### Star rating
+
+As our first target variable is star rating, for which we build linear regression models.
 
 In our first model, we used date as the only predictor, and found that there is only a significant difference in ratings in October compared to our baseline of January, with an increase of 1.06 from 2.29.
 
@@ -243,7 +247,16 @@ Afterwards, we found that a higher sentiment score of both the review text and t
 
 Next, we looked at emotion: out of the eight emotions, only joy and disgust deemed significant, unsurprisingly with the former having a positive and the latter having a negative effect on ratings. However, with the combination of sentiment scores and emotions, both the title and text sentiments were significant, but none of the emotions. 
 
+Adding back dates to the previous model, we find that none of them are significant. We therefore arrived at the conclusion that the best combination of predictors to use are the sentiment scores and review length. To validate this claim, we looked at AIC scores and found that this model had the lowest value.
 
+The summary of the model:
+![Best linear model](media/star_3.png)
+
+#### Other models
+
+Afterwards, we used logistic regression models to predict whether a review give 5 stars. We have found that besides the above mentioned predictors, surprise was also significant, negatively impacting the odds of a five star review. No other emotions were significant.
+
+For the prediction of whether at least 10 people will find a review helpful, only review length showed to be significant. As opposed to the ratings, sentiment score did not hold predictive power.
 
 
 
@@ -1016,6 +1029,23 @@ summary(stars_5)
 When modeling star ratings based on emotions, sentiments & review_length we find out that the emotion surprise, the sentiment of the title and the word count of the review have a significant impact in determining the final rating.
 Surprise and long reviews go hand in hand with lower ratings, while positive title sentiment is associated with higher ratings.
 The other emotion categories remain insignificant.
+
+
+```{r}
+stars_5a <- lm((star_rating_num ~ ave_emotion.anger+ave_emotion.anticipation + ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy +ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + (sentiment_title$ave_sentiment) + (sentiment_text$ave_sentiment) + review_length + as.factor(strftime(formatted_dates, "%m"))), data=reviews_scraped)
+summary(stars_5a)
+```
+
+```{r}
+AIC(stars_1)
+AIC(stars_2)
+AIC(stars_3)
+AIC(stars_4)
+AIC(stars_5)
+AIC(stars_5a)
+```
+
+
 
 We can try a full model for determining if the rating will have 5 stars:
 

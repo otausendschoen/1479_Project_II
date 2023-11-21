@@ -220,14 +220,32 @@ Process-wise after pre-processing, a document term matrix is created, the number
 Applying our LDA model, with the number of topics to be determined to three, we identified the following topics:
 
 - Quality: People seem to be talking about the quality of the product and the purchasing process. Words like "good", "work" and "excel" are associated with it.
-- Technical Issues: In this case, people seem to be talking about technical issues, mentioning potential issues like "battery", "scratch" and "speaker".
+- Hardware: In this case, people seem to be talking about technical aspects, mentioning words "battery", "scratch" and "speaker".
 - Value: For this topic, people seem to be adressing the value of the purchased product, which is in our case a refurbished/renewed product. Mentiong word like "great", "new", "life", "condit" and "worth".
 
 Lastly, we examine the relative importance of the individual topics in our review, which is shown in the chart.
 
 ![Relevance of individual topics.](media/topic_importance.png)
 
-Interestingly, all identified topics seem to have the same relative importance. However, one must critically notw that this could also be the case due to the dataset generation process and the hereby introduced bias. Further analysis would be necessary to achieve a clear differentation.
+Interestingly, all identified topics seem to have the same average relative importance. It is also worth to note that the lowest relative importance that a topic has in our entire dataset was 0.28 (for the topic "quality") and the maximum value was .39 for "hardware". The 1st quantile is .32 for all topics, and "quality" has the highest 3rd quantile value at under .35. This means that all three topics are approximately evenly present in the overwhelming reviews, and therefore are not suitable predictors for star rating.
+
+However, one must critically note that this could also be the case due to the dataset generation process and the hereby introduced bias. Further analysis and more data would be necessary to achieve a clear differentiation.
+
+## Modeling approaches
+
+After conducting the above analyses, we move on to modeling the star ratings of our product using different features that we have derived in the previous chapters, using either linear or logistic regression, the former for the prediction of the ratings and the latter for predicting whether a rating will be five stars. Our aim with the modeling is to better understand which factors are a significant predictor of ratings.
+
+In our first model, we used date as the only predictor, and found that there is only a significant difference in ratings in October compared to our baseline of January, with an increase of 1.06 from 2.29.
+
+Next, we used review length as a predictor and found that it negatively impacts ratings with a statistical significance. We kept review length as a predictor in all of our following models.
+
+Afterwards, we found that a higher sentiment score of both the review text and title has a significant, positive effect on ratings.
+
+Next, we looked at emotion: out of the eight emotions, only joy and disgust deemed significant, unsurprisingly with the former having a positive and the latter having a negative effect on ratings. However, with the combination of sentiment scores and emotions, both the title and text sentiments were significant, but none of the emotions. 
+
+
+
+
 
 \newpage
 

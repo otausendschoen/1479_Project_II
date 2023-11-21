@@ -1,6 +1,6 @@
 ---
-title: "Project_2"
-author: "Oliver Tausendschön, Manuel Carli, Caroline Meyer, Benedek Takacs"
+title: "Project II"
+author: "Group 01 - M. Carli , C. Meyer, O. Tausendschön & B. Takács"
 date: "2023-11-15"
 output: pdf_document
 toc: true
@@ -44,16 +44,16 @@ If the brand's goals are a high star rating and happy consumers, our study will 
 Before analysing the data, we actually have to get the data.
 We did this by using a basic webscraper to extract important information on the prodct´s review page.
 
-## Scraping the data
+## Scraping the Data
 
-To scrape reviews which we can then analyze we start by installing necessary / helpful packages.
+To scrape reviews which we can then analyze we start by installing necessary and helpful packages.
 We could then start with tasks such as HTML parsing and mimicking a browser with a machine.
 
 However, we quickly ran into problems as Amazon makes an effort to prevent scraping, particularly when many pages are being scraped.
-We started by trying the code with different products and pages, experimenting with differend HTML nodes and xpaths.
-All this was done with the R-package Rvest.
-In the end, we created custom headers, a random time out to to miick human behaviour as well as to avoid being "too aggressive" and imitated request headers.
-We managed to scrape 100 reviews without filtering for specific terms. More reviews where not attainable, since Amazon, as part of their web-scraping prevetion, limits the number of pages of reviews to be viewed to 10, and the number of reviews per page also to 10.
+We started by trying the code with different products and pages, experimenting with different HTML nodes and xpaths.
+All this was done with the R-package `Rvest`.
+In the end, we created custom headers, a random time out to to mimick human behaviour as well as to avoid being "too aggressive" and imitated request headers.
+We managed to scrape 100 reviews without filtering for specific terms. More reviews where not attainable, since Amazon, as part of their web-scraping prevention, limits the number of pages of reviews to be viewed to 10, and the number of reviews per page also to 10.
 To increase the dataset size, we filtered for all five possible star ratings and obtained the 100 available reviews per star rating, resulting in a total of 500 (5x100) reviews. However, this comes with the big downside of introducing a bias.
 We nevertheless decided to continue as one purpose of this project is to carry out a complete analysis and larger, although biased, dataset allows for intersting insights into the different wordings, sentiments and emotions associated with different star ratings.
 
@@ -63,7 +63,7 @@ Our dataset thus contains 500 observations with 6 variables.
 The variables are the following: 
 
 - `review_title`: This is the title of the review 
-- `review_text``: This is the review itself.
+- `review_text`: This is the review itself.
 - `formatted_date`: This is the date when the review was published.
 - `verified`: This indicated whether a review is made by an officially verified buyer or not.
 - `N_helpful`: This is the count of people that marked the review as being helpful.
@@ -86,12 +86,14 @@ This can be shown by using a histogram of the distribution of star ratings. Note
 Another visualization of the **distribution of star ratings** might be helpful to see how the product has performed in general.
 Thus, we present a histogram:
 
-![Distribution_of_Stars.](media/test.png)
+![Distribution of star ratings.](media/test.png){width=45%}
+
+\newpage
 
 We can also visalize the average star rating across time.
 This gives us a good guess of how the quality of the product might deteriorate or improve.
 
-![Development_Stars.](media/Development_Stars.png) 
+![Development of average star ratings over time.](media/Development_Stars.png){width=55%}
 
 It seems as the average rating improves in the long term, which is a good sign.
 Let´s see if there is any correlation with **the number of reviews published across our time period**.
@@ -100,22 +102,23 @@ Also, the average rating seems to improve already after the first reviews and st
 
 It might also be interesting to take a look at **the number of reviews published across our time period** and see if and how this corresponds to the development of the star ratings.
 
-![Number_of_reviews.](media/Number_of_reviews.png)
+![Number of reviews across time.](media/Number_of_reviews.png){width=55%}
 
-We can see a bit of seasonality in this plot but mainly, there is an increasing tendency of the reviews.
+The plot suggest that most of the reviews were published recently.
 
 When comparing the two plots we can see that overall the review-situation improved over time: Both more reviews and better reviews were published in the long run.
-The dip in June might be interesting to analyze - especially to see if it remains so apparent when the dataset of reviews is larger and less restricted.
+
+\newpage
 
 Furthermore, we might want to take a look at **helpfulness of the reviews**.
 We can see that the reviews were rated as helpful by between 0 and 50 people, with an average of 3.47 and a median of 0 as well.
 This indicates skewedness and strong outliers, so we want to take a closer look:
 
-![Distribution_of_helpfulness](media/Distribution_of_helpfulness.png)
+![Frequency of helpful reviews.](media/Distribution_of_helpfulness.png)
 
-This supports our hypothesis that the vast majority of reviews are rated as non-helpful by very few to none people.
+This supports our hypothesis that the vast majority of reviews are rated as helpful by very few to none people.
 Only very few people attained over 15 "helpfulness"-votes.
-We can see the "Winner takes it all" principle.
+We can see the "Winner takes it all" principle at play.
 Overall a third of the reviews were perceived as helpful, meaning that at least 1 customer rated them as such.
 
 ## Text Analysis
@@ -124,29 +127,31 @@ This section focuses on text analysis, aiming to uncover patterns, relationships
 
 To kick off our text analysis, we start by taking a look at review length.
 We can see that the average length of a review in our dataset is about 70 words.
-But what might be more interesting is the \*\*correlation between the length of a reviews and its rating.
-The correlation is about -0.3 What this reveals is that long reviews tend to be more negative or that customers who have a negative opinion about a product tend to share more information to explain or complain.
+But what might be more interesting is the correlation between the length of a reviews and its rating.
+The correlation is about -0.3. What this reveals is that long reviews tend to be more negative or that customers who have a negative opinion about a product tend to share more information to explain or complain.
 
-\*\*correlation between the length of a review and its helpfulness The correlation is at about 0.63 This leads to the conclusion that longer reviews tend to be rated as more helpful as they for example share more information and details that can be useful for other potential customers.
+The correlation between the length of a review and its helpfulness is at about 0.63. This leads to the conclusion that longer reviews tend to be rated as more helpful as they for example share more information and details that can be useful for other potential customers.
 
 Now let us dive even deeper into text analysis than merely the word count.
 Let's have a look at **what people actually write in their reviews**.
 To do this, we cleaned the reviews by removing special characters, nubers, punctuation, extra white spaces, common stopwords and reduced all words to their stem.
-After unsurprisingly seeing words like Phone, iphone, apple as the most frequent, we removed these and contructed the following wordcloud:
+After unsurprisingly seeing words like Phone, iphone, apple as the most frequent, we removed these and constructed a wordcloud (see Figure 5).
 
-![Wordcloud](media/Wordcloud.png) 
+![Wordcloud providing an overview concerning the word frequency.](media/Wordcloud.png){width=60%}
 
 This reveals a much more interesting picture.
-We chose that all terms that are mentioned at least 5 times in the 100 reviews are shown in the word cloud.
+We chose to show all terms that are mentioned at least 5 times in the 100 reviews in the word cloud.
 The by far biggest and thus most frequently used significant term in reviews is "battery".
 Additionally screen and scratches as well as condition might be interesting ones to dive into.
 
 Let us now do the same for the titles of the reviews and see if there are differences:
 
-![Wordcloud](media/Wordcloud_title.png)
+![Wordcloud](media/Wordcloud_title.png){width=60%}
 
 Since this word cloud is less informative, we will include more words (at lower frequency threshold) and see an overwhelming frequency of very positive terms (good, great, perfect).
 This is a positive indicator.
+
+\newpage
 
 ## Sentiment analysis
 
@@ -157,10 +162,10 @@ Packages such as `sentimentr` in R work by scanning the text to see if words in 
 The words are then assigned a value (\>0 if the word is located on the positive list, \<0 if it is on the negative one) - all values are added together and the average sentiment is determined.
 Important note: The packages take the words before and after a term into account in order to assess its classification. This way valence shifters or negations can be included.
 Sentiment analysis can be applied in a number of fields and situations.
-Its use-cases range from social media monitoring, political campaigns, PR and market research.
+Its use-cases range from social media monitoring, political campaigns, PR to market research.
 
 We now want to start our first computations in the field of sentiment analysis to get a better picture about the general tonality and sentiment of the reviews we are examining.
-In this we will differentiate between title and text look at the correlation between them and their general behavior.
+In this we will differentiate between title and text, look at the correlation between them and their general behavior.
 
 The computations reveal that in the review texts, sentiment ranges from -0.54 to 1.42 and averages at around 0.25.
 For the titles, the lowest sentiment is -1.44, the highest is 1.23 and the average is around 0.35.
@@ -170,16 +175,18 @@ We also prove that the sentiment of title and review text are correlated since t
 
 Now, similar to the way we wanted to check if the rating behavior changed over time we want to take a look at the **development of sentiment over time**:
 
-![Sentiments](media/Average_sentiment_time.png)
+![Sentiments](media/Average_sentiment_time.png){width=70%}
 
 When comparing the plots of how sentiment (in both title and text) developed, we can see a clear correlation with average rating.
 This is good to see as it confirms that users who put a better rating put more positive emotions into the review.
 
-Let us now analyse how sentiment & other variables interact in more detail: 
+\newpage
 
-![Corplot](media/corplot.png)
+Let us now analyse how sentiment and other variables interact in more detail: 
 
-In this correlation plot/matrix we can see a rather strong positive correlation between sentiment in title and sentiment in text - this we have already found out.
+![Corplot](media/corplot_new.png){width=60%}
+
+In this correlation plot or matrix we can see a rather strong positive correlation between sentiment in title and sentiment in text - this we have already found out.
 Additionally we can see slight negative correlations between text length and sentiment.
 This further supports our findings that longer reviews will have a worse rating.
 Star ratings thus negatively correlate with text length, but are positively impacted by the sentiment score.
@@ -190,21 +197,25 @@ All in all, we are glad to see this as it confirms our previous assumptions.
 With emotion analysis we aim to get more detailed insights into the emotions that are expressed in reviews by differentiating not only between positively and negatively connotated terms, but a more developed spectrum of emotions.
 As a basis, Plutchik's wheel of emotion is used.
 
-![Wheel of Emotion](media/wheel_of_emotions.jpg)
+![Wheel of Emotion](media/wheel_of_emotions.jpg){width=50%}
+
+\newpage
 
 In order to obtain insights into the emotions in the review texts, we categorize the extracted emotions into the categories of the Wheel of Emotion and examine the degree of average emotion.
 
-![Categorization of review text according to Wheel of Emomotion.](media/wheel_of_emotions_review_texts.png)
+![Categorization of review text according to Wheel of Emomotion.](media/wheel_of_emotions_review_texts.png){width=80%}
 
 Furthermore, in order to determine the relevance of the individual emotions, we examine their prevelance among the review texts:
 
-![Prevelance of emotions.](media/emotions_review_text.png)
+![Prevelance of emotions.](media/emotions_review_text.png){width=70%}
 
-The barchart above shows the determined prevelance of the indivual emotions. The higher the bar, the higher the relevance of the corresponding emotion. Based on the plot, we can infer the most dominant emotions in the review texts: the latter are anticipation (orange bar), joy (yellow bar) and trust (light green bar). However, also anger plays an important role in the reviews as well as the emotion of surprise.
+The barchart above shows the determined prevalence of the individual emotions. The higher the bar, the higher the relevance of the corresponding emotion. Based on the plot, we can infer the most dominant emotions in the review texts: the latter are anticipation (orange bar), joy (yellow bar) and trust (light green bar). However, also anger plays an important role in the reviews as well as the emotion of surprise.
+
+\newpage
 
 To increase our understanding of the emotions expressed in the reviews, we chose to examine the correlation between the individual emotions to uncover possible connections and insights into how the different emotions might go hand in hand with another in the reviews we are examining. The therefore obtained results are shown in a correlation matrix.
 
-![Correlation among different emotions.](media/emotions_correlation.png)
+![Correlation among different emotions.](media/emotions_correlation.png){width=60%}
 
 The results reveal a high positive correlation between joy and anticipation, joy and trust, anticipation and surprise and trust as well as between surprise and anticipation. No noteworthy negative correlation among emotions seems to be present.
 
@@ -235,10 +246,11 @@ However, one must critically note that this could also be the case due to the da
 
 After conducting the above analyses, we move on to modeling the star ratings of our product using different features that we have derived in the previous chapters. Our aim with the modeling is to better understand which factors are a significant predictor of ratings.
 
+\newpage
+
 #### Star rating
 
 As our first target variable is star rating, for which we build linear regression models.
-
 In our first model, we used date as the only predictor, and found that there is only a significant difference in ratings in October compared to our baseline of January, with an increase of 1.06 from 2.29.
 
 Next, we used review length as a predictor and found that it negatively impacts ratings with a statistical significance. We kept review length as a predictor in all of our following models.
@@ -247,14 +259,15 @@ Afterwards, we found that a higher sentiment score of both the review text and t
 
 Next, we looked at emotion: out of the eight emotions, only joy and disgust deemed significant, unsurprisingly with the former having a positive and the latter having a negative effect on ratings. However, with the combination of sentiment scores and emotions, both the title and text sentiments were significant, but none of the emotions. 
 
-Adding back dates to the previous model, we find that none of them are significant. We therefore arrived at the conclusion that the best combination of predictors to use are the sentiment scores and review length. To validate this claim, we looked at AIC scores and found that this model had the lowest value. Out of the ones created.
+Adding back dates to the previous model, we find that none of them are significant. We therefore arrived at the conclusion that the best combination of predictors to use are the sentiment scores and review length. To validate this claim, we looked at AIC scores and found that this model had the lowest value, out of the ones created.
 
-However, with stepwise variable selection we could slightly reduce AIC further. This model added the emotions of anticipation, fear and joy to our simplified model. Our model of choice therefore:
+However, with stepwise variable selection we could slightly reduce AIC further. This model added the emotions of anticipation, fear and joy to our simplified model. Our model of choice therefore is:
+
 ![Best linear model](media/star_step.png)
 
 #### Other models
 
-Afterwards, we used logistic regression models to predict whether a review give 5 stars. We have found that besides the above mentioned predictors, surprise was also significant, negatively impacting the odds of a five star review. No other emotions were significant. To this, by adding the dates as well we reached a model including all our variables. Although no predictors were significant besides the sentiment scores, AIC favoured the full model. Using stepwise variable selection, we excluded some emotions except anger, joy and surprise, further lowering AIC. 
+Afterwards, we used logistic regression models to predict whether a review will yield 5 stars. We have found that besides the above mentioned predictors, surprise was also significant, negatively impacting the odds of a five star review. No other emotions were significant. To this, by adding the dates as well we reached a model including all our variables. Although no predictors were significant besides the sentiment scores, AIC favoured the full model. Using stepwise variable selection, we excluded some emotions except anger, joy and surprise, further lowering AIC. 
 
 For the prediction of whether at least 10 people will find a review helpful, only review length showed to be significant. As opposed to the ratings, sentiment score did not hold predictive power. Using stepwise variable selection, we landed on a model that had included review length and title sentiment only.
 
@@ -264,13 +277,14 @@ Overall, this report presents a comprehensive analysis of customer reviews for a
 
 Altough getting into challenges and not being able to scrape the entire product page, we managed to carefully analyzed a big variety of reviews with mixed emotions, topics and ratings. 
 On a general level, we found out the following:
+
 - Reviews span from June 6, 2020, to November 17, 2023, showing a long-time perspective.
 - Average star rating is 3, with a histogram showing an equal distribution due to the web scraping method.
 - Improvement in average rating over time, with an increase in both the number and quality of reviews.
-- Seasonality observed in the number of reviews, with an overall increasing trend
+- Seasonality observed in the number of reviews, with an overall increasing trend.
 
 In regard to text analysis, we saw that the term "battery" is used most frequently, indicating that people talk about this often, making it crucial for the company to adress various batter related topics. 
-A Sentiment analysis shows positive sentiments in both titles and review texts. These have a correlation to star ratings.Emotion analysis identifies dominant emotions as anticipation, joy, trust, anger, and surprise.
+A sentiment analysis shows positive sentiments in both titles and review texts. These have a correlation to star ratings. Emotion analysis identifies dominant emotions as anticipation, joy, trust, anger, and surprise.
 
 We also employed a Latent Dirichlet Allocation (LDA) to identify three topics: Quality, Hardware, and Value.
 All topics are evenly present in reviews, but not significant predictors for star ratings. Similarly to the most frequently used terms, this shows what the company should focus as these topics are highly discussed in the reviews.
@@ -287,11 +301,11 @@ Finally, we applied linear regression using predictors such as date, review leng
 The appendix contains the technical analysis of the available data, including all the corresponding R-code.
 For the analysis we used the following R-packages:
 
-# Scraping the data
+## Scraping the data
 
 To scrape reviews which we can then analyze we start by installing necessary / helpful packages:
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(rvest,
                polite,
@@ -329,7 +343,8 @@ reviews_per_page <- 10
 iters <- ceiling(n_reviews/reviews_per_page)
 
 # Set the base and additional URL parameters
-url_p1 <- "https://www.amazon.com/Apple-iPhone-11-128GB-Black/product-reviews/B07ZPKR714/ref=cm_cr_getr_d_paging_btm_"
+url_p1 <- "https://www.amazon.com/Apple-iPhone-11-128GB-Black/product-reviews/
+B07ZPKR714/ref=cm_cr_getr_d_paging_btm_"
 url_p2 <- "?ie=UTF8&reviewerType=all_reviews&pageNumber="
 url_p3 <- "&filterByStar="
 
@@ -346,12 +361,15 @@ set.seed(1479)
 for (filter in filters) {
   for (i in 1:iters) {
     # Construct the URL for each iteration
-    url <- paste0(url_p1, ifelse(i == 1, "prev_1", paste0("next_", i)), url_p2, i, url_p3, filter)
+    url <- paste0(url_p1, ifelse(i == 1, "prev_1", paste0("next_", i)), url_p2, 
+                  i, url_p3, filter)
     
     # Set custom headers to mimic a browser request
     headers <- c(
-      'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-      'Accept' = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+      'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 
+      (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+      'Accept' = 'text/html,application/xhtml+xml,application/xml;q=0.9,
+      image/webp,image/apng,*/*;q=0.8'
       # Add more headers as needed
     )
     
@@ -361,10 +379,13 @@ for (filter in filters) {
     # Check if the request was successful (status code 200)
     if (httr::status_code(response) == 200) {
       # Read the HTML content of the page
-      page <- read_html(content(response, "text")) #page <- read_html(content(response, "text"))
+      page <- read_html(content(response, "text")) 
       
       # Extract Body of 10 reviews per page
-      page <- page %>% html_elements(xpath = "/html/body/div[1]/div[2]/div/div[1]/div/div[1]/div[5]/div[3]/div")
+      page <- page %>% 
+        html_elements(
+          xpath = "/html/body/div[1]/div[2]/div/div[1]/div/div[1]/div[5]
+          /div[3]/div")
       
       # Extract review information from the page
       ## Review Title
@@ -395,7 +416,8 @@ for (filter in filters) {
       review_verified <- data.frame(Verified = rep(FALSE, length(reviews)))
       j <- 1
       for (element in reviews)
-      {if (str_detect(str_squish(html_text(element)), fixed("Verified Purchase"))) {
+      {if (str_detect(str_squish(html_text(element)), 
+                      fixed("Verified Purchase"))) {
         review_verified[j, ] <- TRUE
       }
         j <- j+1}
@@ -438,13 +460,16 @@ for (filter in filters) {
       star_rating_num <- as.numeric(match_result_star)
       
       # Create a data frame with the extracted information
-      reviews_comb <- data.frame(review_title, review_text, formatted_dates, review_verified, review_n_helpful, star_rating_num)
+      reviews_comb <- data.frame(review_title, review_text, formatted_dates, 
+                                 review_verified, review_n_helpful, 
+                                 star_rating_num)
       
       # Append reviews to the data frame
       reviews_all <- rbind(reviews_all, reviews_comb)
     } else {
       # Print a warning if the request fails
-      warning(paste("Request failed with status code:", httr::status_code(response)))
+      warning(paste("Request failed with status code:", 
+                    httr::status_code(response)))
     }
     reviews_scraped <- rbind(reviews_all)
     # Add a random timeout to avoid being too aggressive
@@ -454,14 +479,13 @@ for (filter in filters) {
   }
 }
 
-#save(reviews_scraped, file="Reviews_Scraped_500_v2.rda")
+save(reviews_scraped, file="Reviews_Scraped_500_v2.rda")
 ```
 
 Now let us take a look at the dataframe that we have created via the code chunk above and the structure that we are working with:
 
 ```{r}
 load("reviews_scraped_500_v2.rda")
-head(reviews_scraped)
 str(reviews_scraped)
 ```
 
@@ -509,7 +533,8 @@ Thus, here we present a histogram:
 ```{r}
 stars <- reviews_scraped$star_rating_num
 cols <- c("dark red", "red", "orange", "yellow", "green")
-hist(stars, main="Distribution of Star Ratings",xlab="stars", col=cols, breaks = 0:5)
+hist(stars, main="Distribution of Star Ratings",xlab="stars", col=cols, 
+     breaks = 0:5)
 ```
 Here we can also see the bias introduced to the data due to the scraping method.
 
@@ -527,7 +552,8 @@ Now we want to check whether the **average rating has improved or deteriorated**
 plottingstars <- aggregate(reviews_scraped$star_rating_num ~ dates, FUN = mean)
 plot(plottingstars[,2],type="l" ,xlab="Date",xaxt="n",ylab="Average Rating"
      ,main="Development of Average Star Ratings")
-axis(side=1,at=1:nrow(plottingstars)-0.5,labels=plottingstars[1:nrow(plottingstars),1])
+axis(side=1,at=1:nrow(plottingstars)-0.5,
+     labels=plottingstars[1:nrow(plottingstars),1])
 ```
 
 It seems as the average rating oscillated between Nov 2020 and Dec 2022, then shows a downwards trend until May 2023, after which it increases until the end of our time period.
@@ -537,12 +563,13 @@ It might also be interesting to take a look at **the number of reviews published
 ```{r}
 # plot number of reviews distribution across time
 plottingcount <- aggregate(reviews_scraped$star_rating_num ~ dates, FUN = length)
-barplot(plottingstars[,2], main="Number of reviews across time",xlab="Time",xaxt="n",
-        ylab="Number of reviews", space=0)
-axis(side=1,at=1:nrow(plottingcount)-0.5,labels=plottingcount[1:nrow(plottingcount),1])
+barplot(plottingcount[,2], main="Number of reviews across time",xlab="Time",
+        xaxt="n", ylab="Number of reviews", space=0)
+axis(side=1,at=1:nrow(plottingcount)-0.5,
+     labels=plottingcount[1:nrow(plottingcount),1])
 ```
 
-Interestingly we see the same trend as with the ratings, oscillating till Nov 2022, downwards trend till May 2023, then upwards trend until Nov 2023.
+As the plot suggests, our dataset contains mostly recent reviews.
 
 
 Furthermore, we might want to take a look at **helpfulness of the reviews**.
@@ -561,8 +588,11 @@ This indicates skewedness and strong outliers, so we want to take a closer look.
 
 ```{r}
 helpful <- reviews_scraped$N_helpful
-cols <- c("dark red", "red", "orange", "yellow", "light yellow", "light green", "green", "dark green", "blue", "purple")
-hist(helpful, main="Distribution of Helpfulness",xlab="Number of people who found this review helpful", col=cols, breaks = seq(0, 55, by=5))
+cols <- c("dark red", "red", "orange", "yellow", "light yellow", "light green", 
+          "green", "dark green", "blue", "purple")
+hist(helpful, main="Distribution of Helpfulness",
+     xlab="Number of people who found this review helpful", col=cols, 
+     breaks = seq(0, 55, by=5))
 ```
 
 This supports our hypothesis that the vast majority of reviews are rated as helpful by very few to no people.
@@ -586,7 +616,8 @@ Let us start by looking at **how long the review texts are**:
 
 ```{r}
 reviews_scraped$review_text_2 <- reviews_scraped$review_text
-reviews_scraped$review_text_2 <-  gsub('[[:punct:] ]+',' ',reviews_scraped$review_text_2)
+reviews_scraped$review_text_2 <-  gsub('[[:punct:] ]+',' ',
+                                       reviews_scraped$review_text_2)
 #split into substrings 
 reviews_scraped$review_text_2 <-strsplit(reviews_scraped$review_text_2, " ")
 #count the number of strings = number of words
@@ -609,7 +640,7 @@ correlation <- cor(reviews_scraped$review_length, reviews_scraped$star_rating_nu
 correlation
 ```
 
-The correlation is -0.335
+The correlation is -0.335.
 What this reveals is that long reviews tend to be more negative or that customers who have a negative opinion about a product tend to share more information to explain or complain.
 This however is a weak correlation.
 
@@ -668,7 +699,7 @@ If we want to make room for new revelations, we can remove them.
 
 Therefore we will make further alterations to remove chosen words such as the product name itself - this wors via custom stop words:
 
-```{r}
+```{r, warning=FALSE}
 # specify your custom stopwords as a character vector
 TextDoc <- tm_map(TextDoc, removeWords, c("iphone","phone","apple")) 
 
@@ -693,7 +724,7 @@ Additionally screen and scratches as well as condition might be interesting ones
 
 Let us now do the same for the titles of the reviews and see if there are differences:
 
-```{r}
+```{r, warning=FALSE}
 # we start by loading in our text data as a "corpus"
 TextDoc <-  Corpus(VectorSource((reviews_scraped$review_title)))
 
@@ -756,9 +787,11 @@ reviews_scraped$sentiment_text=sentiment_by(sentences)
 sentences_title <- get_sentences(reviews_scraped$review_title)
 reviews_scraped$sentiment_title=sentiment_by(sentences_title)
 
-summary(cbind(reviews_scraped$sentiment_text$ave_sentiment,reviews_scraped$sentiment_title$ave_sentiment))
+summary(cbind(reviews_scraped$sentiment_text$ave_sentiment,
+              reviews_scraped$sentiment_title$ave_sentiment))
 
-cor.test(reviews_scraped$sentiment_text$ave_sentiment, reviews_scraped$sentiment_title$ave_sentiment)
+cor.test(reviews_scraped$sentiment_text$ave_sentiment, 
+         reviews_scraped$sentiment_title$ave_sentiment)
 ```
 
 The computations reveal that in the review texts, sentiment ranges from -0.55 to 1.42 and averages at around 0.11.
@@ -771,21 +804,26 @@ We also prove that the sentiment of title and review text are correlated since t
 Now, similar to the way we wanted to check if the rating behavior changed over time we want to take a look at the **development of sentiment over time**:
 
 ```{r}
-textsentiment_agg<-aggregate(reviews_scraped$sentiment_text$ave_sentiment ~ dates, FUN = mean)
-titlesentiment_agg<-aggregate(reviews_scraped$sentiment_title$ave_sentiment ~ dates, FUN = mean)
+textsentiment_agg<-aggregate(reviews_scraped$sentiment_text$ave_sentiment ~ dates, 
+                             FUN = mean)
+titlesentiment_agg<-aggregate(reviews_scraped$sentiment_title$ave_sentiment ~ dates, 
+                              FUN = mean)
 starratings_agg<-aggregate(reviews_scraped$star_rating_num ~ dates, FUN = mean)
 
 par(mfrow=c(1,2))
-plot(textsentiment_agg[,2],type="l" ,xlab="Time",xaxt="n",ylab="Sentiment Polarity", ylim=c(-0.5, 0.8),
+plot(textsentiment_agg[,2],type="l" ,xlab="Time",xaxt="n",
+     ylab="Sentiment Polarity", ylim=c(-0.5, 0.8),
      main="Sentiment across time",col="light blue")
-lines(titlesentiment_agg[,2],type="l" ,xlab="Time",xaxt="n",ylab="Sentiment Polarity"
-      ,main="Sentiment across time",col="purple")
-axis(side=1,at=1:nrow(textsentiment_agg),labels=textsentiment_agg[1:nrow(textsentiment_agg),1])
+lines(titlesentiment_agg[,2],type="l" ,xlab="Time",xaxt="n",
+      ylab="Sentiment Polarity", main="Sentiment across time",col="purple")
+axis(side=1,at=1:nrow(textsentiment_agg),
+     labels=textsentiment_agg[1:nrow(textsentiment_agg),1])
 legend("bottomright",c("text","title"),fill=c("light blue","purple"))
 
 plot(starratings_agg[,2],type="l" ,xlab="Time",xaxt="n",ylab="Average rating"
      ,main="Average rating across time")
-axis(side=1,at=1:nrow(starratings_agg),labels=starratings_agg[1:nrow(starratings_agg),1])
+axis(side=1,at=1:nrow(starratings_agg),
+     labels=starratings_agg[1:nrow(starratings_agg),1])
 legend("bottomright","rating",fill="black")
 ```
 
@@ -795,10 +833,15 @@ Additionally the left plot highlights the extremity of titles compared to text.
 We can take a look at how sentiment & other variables interact in more detail:
 
 ```{r}
-corrm <- cor(cbind(reviews_scraped$sentiment_text$ave_sentiment,reviews_scraped$sentiment_title$ave_sentiment,reviews_scraped$review_length, reviews_scraped$star_rating_num))
-colnames(corrm) <- c("sentiment_text","sentiment_title","text_length", "star_ratings")
-rownames(corrm) <- c("sentiment_text","sentiment_title","text_length", "star_ratings")
-corPlot(corrm ,numbers=T,diag=T,upper=F,  main="Correlations between variables", xact = "n")
+corrm <- cor(cbind(reviews_scraped$sentiment_text$ave_sentiment,
+                   reviews_scraped$sentiment_title$ave_sentiment,
+                   reviews_scraped$review_length, reviews_scraped$star_rating_num))
+colnames(corrm) <- c("sentiment_text","sentiment_title","text_length", 
+                     "star_ratings")
+rownames(corrm) <- c("sentiment_text","sentiment_title","text_length", 
+                     "star_ratings")
+corPlot(corrm ,numbers=T,diag=T,upper=F,  main="Correlations between variables", 
+        xact = "n")
 ```
 
 From the correlation plot we can see a rather strong positive correlation between sentiment in title and sentiment in text - this we have already found out.
@@ -810,18 +853,23 @@ Star ratings thus negatively correlate with text length, but are positively impa
 
 In emotion analysis we get more detailed insights in the emotions that are expressed in reviews by differentiating not only between positively and negatively annotated terms, but a more developed spectrum of emotions.
 As a basis, Plutchik's wheel of emotion is used.
-![Wheel of Emotion](media/wheel_of_emotions.jpg)
 
 We now want to find out about the emotions in our reviews:
 
 ```{r}
 text_emotions <- emotion_by(sentences)
-emotiontext_agg<-aggregate(text_emotions$ave_emotion ~ (text_emotions$emotion_type), FUN = mean)
-emotiontext_agg <- subset(emotiontext_agg,(1:dim(emotiontext_agg)[1])%%2==1) #look at non-negated only
-plot(emotiontext_agg,xaxt="n", ylab="Degree of avg. emotion",xlab="Emotions",main="Wheel of Emotions for Review Texts")
+emotiontext_agg<-aggregate(text_emotions$ave_emotion ~ (text_emotions$emotion_type), 
+                           FUN = mean)
+emotiontext_agg <- subset(emotiontext_agg,
+                          (1:dim(emotiontext_agg)[1])%%2==1) #non-negated only
+plot(emotiontext_agg,xaxt="n", ylab="Degree of avg. emotion",xlab="Emotions",
+     main="Wheel of Emotions for Review Texts")
 axis(side=1,at=row.names(emotiontext_agg),labels=emotiontext_agg[c(1:8),1])
-colors = c("red", "orange", "purple", "dark green", "yellow", "blue", "turquoise", "light green")
-barplot(emotiontext_agg[, 2], names.arg = emotiontext_agg[, 1], col = colors, main="Emotion Analysis for Review Texts", ylim=c(0, 0.04), xlab="Emotion", ylab = "Average Prevalence of Emotion")
+colors = c("red", "orange", "purple", "dark green", "yellow", "blue", "turquoise", 
+           "light green")
+barplot(emotiontext_agg[, 2], names.arg = emotiontext_agg[, 1], col = colors, 
+        main="Emotion Analysis for Review Texts", ylim=c(0, 0.04), xlab="Emotion", 
+        ylab = "Average Prevalence of Emotion")
 ```
 
 Essentially, this plot reveals information about how dominant certain emotions are in our review text.
@@ -833,24 +881,34 @@ Now let us take a closer look at the emotions separately:
 ```{r}
 #add emotions to data set
 #reduce to non-negated emotions
-text_emotions_nnegated <- text_emotions[-grep("negated",text_emotions$emotion_type),]
+text_emotions_nnegated <- text_emotions[-grep("negated",
+                                              text_emotions$emotion_type),]
 
 #get average emotions for each review
-temp <- reshape(text_emotions_nnegated[,c(1,2,6)], idvar = "element_id", timevar = "emotion_type", v.names = "ave_emotion",  direction = "wide")
+temp <- reshape(text_emotions_nnegated[,c(1,2,6)], idvar = "element_id", 
+                timevar = "emotion_type", v.names = "ave_emotion",  
+                direction = "wide")
 reviews_scraped <- cbind(reviews_scraped,temp)
-emotions_list <- c("ave_emotion.anger", "ave_emotion.anticipation", "ave_emotion.disgust", "ave_emotion.fear", "ave_emotion.joy", "ave_emotion.sadness", "ave_emotion.surprise", "ave_emotion.trust")
+emotions_list <- c("ave_emotion.anger", "ave_emotion.anticipation", 
+                   "ave_emotion.disgust", "ave_emotion.fear", "ave_emotion.joy", 
+                   "ave_emotion.sadness", "ave_emotion.surprise", 
+                   "ave_emotion.trust")
 summary(reviews_scraped[,emotions_list])
 ```
+
 This again shows that trust, anticipation and joy have the highest means, thus are on average the prevalent emotions expressed in the reviews we are looking at.
 
 Now we want to check if and how emotional categories are potentially related to one another:
 
 ```{r}
 corrE <- cor(reviews_scraped[,emotions_list])
-colnames(corrE) <- c("anger","anticipation","disgust","fear","joy","sadness","surprise","trust")
-rownames(corrE) <-c("anger","anticipation","disgust","fear","joy","sadness","surprise","trust")
+colnames(corrE) <- c("anger","anticipation","disgust","fear","joy","sadness",
+                     "surprise","trust")
+rownames(corrE) <-c("anger","anticipation","disgust","fear","joy","sadness",
+                    "surprise","trust")
 
-corPlot(corrE ,numbers=T,diag=F,upper=F,  main="Correlations between emotions" ,xact="n" )
+corPlot(corrE ,numbers=T,diag=F,upper=F,  main="Correlations between emotions",
+        xact="n" )
 ```
 
 The correlation matrix provides us with information about how the different emotions might go hand in hand with another in the reviews we are examining.
@@ -861,15 +919,18 @@ Let us now also check if our emotions are similar between text and title:
 
 ```{r}
 title_emotions <- emotion_by(sentences_title)
-emotiontitle_agg<-aggregate(title_emotions$ave_emotion ~ (title_emotions$emotion_type), FUN = mean)
+emotiontitle_agg<-aggregate(title_emotions$ave_emotion ~ (title_emotions$emotion_type), 
+                            FUN = mean)
 
 emotiontitle_agg <- subset(emotiontitle_agg,(1:dim(emotiontitle_agg)[1])%%2==1)
 
 par(mfrow=c(1,2))
-plot(emotiontext_agg,xaxt="n",ylab="Word count",xlab="Emotions",main="Emotions for the Review text",
+plot(emotiontext_agg,xaxt="n",ylab="Word count",xlab="Emotions",
+     main="Emotions for the Review text",
       ylim=c(0,0.1))
 axis(side=1,at=row.names(emotiontext_agg),labels=emotiontext_agg[c(1:8),1])
-plot(emotiontitle_agg,xaxt="n",ylab="Word count",xlab="Emotions",main="Emotions of Review title",
+plot(emotiontitle_agg,xaxt="n",ylab="Word count",xlab="Emotions",
+     main="Emotions of Review title",
      ylim=c(0,0.1))
 axis(side=1,at=row.names(emotiontitle_agg),labels=emotiontitle_agg[c(1:8),1])
 ```
@@ -909,10 +970,12 @@ par(mfrow=c(3,3))
 for (k in 2:maxtops){
   
  fitted_LDA <- LDA(DocText_dtm, k = k, method = "Gibbs",
-                    control = list(seed = SEED,burnin = burnin, iter = iter, keep = keep) )
+                    control = list(seed = SEED,burnin = burnin, iter = iter, 
+                                   keep = keep) )
  plot(fitted_LDA@logLiks,type="l", main=paste0(c("iPhone",k),collapse=""))
  words_LDA <- dim(posterior(fitted_LDA)[[1]])[2]
- avg_result_fin[counter,] <- cbind(k, logLik(fitted_LDA),-2*logLik(fitted_LDA)+(k+k*words_LDA))
+ avg_result_fin[counter,] <- cbind(k, logLik(fitted_LDA),
+                                   -2*logLik(fitted_LDA)+(k+k*words_LDA))
  counter=counter+1
 }
 ```
@@ -933,7 +996,8 @@ As the next step, we estimate our topic model.
 ktop <- 3
 
 fitted_LDA_model <- LDA(DocText_dtm, k = ktop, method = "Gibbs",
-                           control = list(seed = SEED,burnin = burnin, iter = iter, keep = keep) )
+                           control = list(seed = SEED,burnin = burnin, 
+                                          iter = iter, keep = keep) )
 ```
 
 From our model, we extract the topics.
@@ -965,7 +1029,8 @@ summary(multi)
 We plot the average imortance of the topics.
 
 ```{r}
-plot(colSums(multi)/dim(multi)[1],type="h", main="Topic importances",ylim=c(0,.4),ylab="relative importance",xlab="topics",xaxt="n",lwd=10,col=2:4)
+plot(colSums(multi)/dim(multi)[1],type="h", main="Topic importances",ylim=c(0,.4),
+     ylab="relative importance",xlab="topics",xaxt="n",lwd=10,col=2:4)
 axis(side=1,at=1:3,labels=colnames(multi))
 ```
 
@@ -978,10 +1043,11 @@ It is worth to note however, that since we are working with a limited amount of 
 
 In the following we will attempt to model the ratings of our product using different features that we have derived in the previous chapters.
 
-Modeling ratings based on **date**:
+Modelling ratings based on **date**:
 
 ```{r}
-stars_1 <- lm(star_rating_num ~  as.factor(strftime(formatted_dates, "%m")), data=reviews_scraped)
+stars_1 <- lm(star_rating_num ~  as.factor(strftime(formatted_dates, "%m")), 
+              data=reviews_scraped)
 summary(stars_1)
 ```
 
@@ -989,7 +1055,7 @@ This model takes a look at the star ratings as a function of time.
 We use the months as factor variables with 02 - February representing our baseline.
 However, we find that only October has a sufficiently low p-value to be considered significant.
 
-Modeling ratings based on **review length**:
+Modelling ratings based on **review length**:
 
 ```{r}
 stars_2 <- lm(star_rating_num ~ review_length, data=reviews_scraped)
@@ -1000,12 +1066,13 @@ This model takes a look at how the review length impacts the star ratings in clo
 We find out that actually, the review length does have a significant impact in determining the stars given in a review.
 This relationship is negative, meaning: the longer a review, the lower the average star rating.
 
-Modeling ratings based on **sentiment**:
+Modelling ratings based on **sentiment**:
 
 ```{r}
-stars_3 <- lm((star_rating_num) ~ (sentiment_title$ave_sentiment) + (sentiment_text$ave_sentiment)
-              + (review_length) 
-               ,    data=reviews_scraped)
+stars_3 <- lm((star_rating_num) ~ (sentiment_title$ave_sentiment) 
+              + (sentiment_text$ave_sentiment)
+              + (review_length),
+              data=reviews_scraped)
 summary(stars_3)
 ```
 
@@ -1014,31 +1081,44 @@ In the case of this model, the sentiment of title as well as the review length a
 While a higher sentiment of the title will lead to an increase in the predicted star rating, a higher word count of the review will lead to a decrease in the predicted star rating.
 We also tested for a model only using sentiment, not review length - here too, only the sentiment of the title resulted in being statistically significant at alpha=0.05.
 
-Modeling ratings based on **emotions**:
+Modelling ratings based on **emotions**:
 
 ```{r}
-stars_4 <- lm((star_rating_num ~ ave_emotion.anger+ave_emotion.anticipation + ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy +ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + (review_length)) 
-              ,    data=reviews_scraped)
+stars_4 <- lm((star_rating_num ~ ave_emotion.anger+ave_emotion.anticipation + 
+                 ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy + 
+                 ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + 
+                 (review_length)), data=reviews_scraped)
 summary(stars_4)
 ```
 
 This model reveals that stars are significantly impacted by review length, and only two of the emotions: joy and disgust.
 
-Modeling ratings based on **sentiments & emotion**:
+Modelling ratings based on **sentiments & emotion**:
 
 ```{r}
-stars_5 <- lm((star_rating_num ~ ave_emotion.anger+ave_emotion.anticipation + ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy +ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + (sentiment_title$ave_sentiment) + (sentiment_text$ave_sentiment)+review_length) 
-              ,    data=reviews_scraped)
+stars_5 <- lm((star_rating_num ~ ave_emotion.anger+ave_emotion.anticipation + 
+                 ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy + 
+                 ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + 
+                 (sentiment_title$ave_sentiment) + 
+                 (sentiment_text$ave_sentiment) +
+                 review_length),
+              data=reviews_scraped)
 summary(stars_5)
 ```
 
-When modeling star ratings based on emotions, sentiments & review_length we find out that no emotions significant impact in determining the final rating, only the sentiment scores and word count of the review.
+When modelling star ratings based on emotions, sentiments & review_length we find out that no emotions significant impact in determining the final rating, only the sentiment scores and word count of the review.
 
 
 ```{r}
-stars_5a <- lm((star_rating_num ~ ave_emotion.anger+ave_emotion.anticipation + ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy +ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + (sentiment_title$ave_sentiment) + (sentiment_text$ave_sentiment) + review_length + as.factor(strftime(formatted_dates, "%m"))), data=reviews_scraped)
+stars_5a <- lm((star_rating_num ~ ave_emotion.anger+ave_emotion.anticipation + 
+                  ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy + 
+                  ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + 
+                  (sentiment_title$ave_sentiment) + (sentiment_text$ave_sentiment) + 
+                  review_length + as.factor(strftime(formatted_dates, "%m"))), 
+               data=reviews_scraped)
 summary(stars_5a)
 ```
+
 With the inclusion of dates the significant predictors remain unchanged: sentiment scores and review length.
 
 ```{r}
@@ -1046,8 +1126,8 @@ stars_step <- step(stars_5a)
 summary(stars_step)
 ```
 
-
 We pick our best model using AIC:
+
 ```{r}
 AIC(stars_1)
 AIC(stars_2)
@@ -1057,29 +1137,44 @@ AIC(stars_5)
 AIC(stars_5a)
 AIC(stars_step)
 ```
-stars_3 has the lowest score outside the one with stepwise selection, which only uses sentiments and review length. stars_step includes anticipation, fear and joy as well, further lowering the AIC by a slight amount.
+
+`stars_3` has the lowest score outside the one with stepwise selection, which only uses sentiments and review length. stars_step includes anticipation, fear and joy as well, further lowering the AIC by a slight amount.
 
 
 
 We do model for determining if the rating will have 5 stars:
 
 ```{r}
-stars_6 <- glm((star_rating_num) > 4 ~ (ave_emotion.anger+ave_emotion.anticipation + ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy +ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + sentiment_title$ave_sentiment + sentiment_text$ave_sentiment+review_length)
-              ,    data=reviews_scraped, family = "binomial")
+stars_6 <- glm((star_rating_num) > 4 ~ (ave_emotion.anger+ave_emotion.anticipation + 
+                                          ave_emotion.disgust +ave_emotion.fear +
+                                          ave_emotion.joy + ave_emotion.sadness +
+                                          ave_emotion.surprise + ave_emotion.trust + 
+                                          sentiment_title$ave_sentiment + 
+                                          sentiment_text$ave_sentiment+review_length),
+               data=reviews_scraped, family = "binomial")
 summary(stars_6)
 ```
+
 When combining all features in a model, besides the above mentioned predictors, surprise is also significant, negatively impacting the odds of a five star review. No other emotions are significant.
 
 ```{r}
-stars_6a <- glm((star_rating_num) > 4 ~ (ave_emotion.anger+ave_emotion.anticipation + ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy +ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + sentiment_title$ave_sentiment + sentiment_text$ave_sentiment+review_length + as.factor(strftime(formatted_dates, "%m")))
-              ,    data=reviews_scraped, family = "binomial")
+stars_6a <- glm((star_rating_num) > 4 ~ (ave_emotion.anger+ave_emotion.anticipation + 
+                                           ave_emotion.disgust +ave_emotion.fear +
+                                           ave_emotion.joy + ave_emotion.sadness + 
+                                           ave_emotion.surprise+ave_emotion.trust + 
+                                           sentiment_title$ave_sentiment + 
+                                           sentiment_text$ave_sentiment+review_length + 
+                                           as.factor(strftime(formatted_dates, "%m"))),
+                data=reviews_scraped, family = "binomial")
 summary(stars_6a)
 ```
+
 ```{r}
 stars_6b <- glm((star_rating_num) > 4 ~ (sentiment_title$ave_sentiment + sentiment_text$ave_sentiment+review_length)
               ,    data=reviews_scraped, family = "binomial")
 summary(stars_6b)
 ```
+
 ```{r}
 stars_6_step <- step(stars_6a)
 summary(stars_6_step)
@@ -1092,41 +1187,55 @@ AIC(stars_6a)
 AIC(stars_6b)
 AIC(stars_6_step)
 ```
+
 Interestingly the full model has the lowest AIC score, even though only the two sentiment scores were significant.
 
-
 Building a conclusive model for helfpulness:
+
 ```{r}
-help_a <- glm((N_helpful) > 10 ~ (ave_emotion.anger+ave_emotion.anticipation + ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy +ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + sentiment_title$ave_sentiment + sentiment_text$ave_sentiment+review_length)
-              ,    data=reviews_scraped, family = "binomial")
+help_a <- glm((N_helpful) > 10 ~ (ave_emotion.anger+ave_emotion.anticipation + 
+                                    ave_emotion.disgust +ave_emotion.fear +
+                                    ave_emotion.joy +ave_emotion.sadness+
+                                    ave_emotion.surprise+ave_emotion.trust + 
+                                    sentiment_title$ave_sentiment + 
+                                    sentiment_text$ave_sentiment+review_length),
+              data=reviews_scraped, family = "binomial")
 summary(help_a)
 ```
+
 This model to determine if a review will be voted as helpful by more than 10 people shows that only the review_length, not the emotion or sentiment of the review is significant in shaping the outcome.
 
-
 ```{r}
-help_a <- glm((N_helpful) > 10 ~ (ave_emotion.anger+ave_emotion.anticipation + ave_emotion.disgust +ave_emotion.fear +ave_emotion.joy +ave_emotion.sadness+ave_emotion.surprise+ave_emotion.trust + sentiment_title$ave_sentiment + sentiment_text$ave_sentiment+review_length+ as.factor(strftime(formatted_dates, "%m")))
-              ,    data=reviews_scraped, family = "binomial")
+help_a <- glm((N_helpful) > 10 ~ (ave_emotion.anger+ave_emotion.anticipation + 
+                                    ave_emotion.disgust +ave_emotion.fear +
+                                    ave_emotion.joy +ave_emotion.sadness+
+                                    ave_emotion.surprise+ave_emotion.trust + 
+                                    sentiment_title$ave_sentiment + 
+                                    sentiment_text$ave_sentiment+review_length+ 
+                                    as.factor(strftime(formatted_dates, "%m"))),
+              data=reviews_scraped, family = "binomial")
 summary(help_a)
 ```
+
 ```{r}
-help_b <- glm((N_helpful) > 10 ~ (sentiment_title$ave_sentiment + sentiment_text$ave_sentiment+review_length)
-              ,    data=reviews_scraped, family = "binomial")
+help_b <- glm((N_helpful) > 10 ~ (sentiment_title$ave_sentiment + 
+                                    sentiment_text$ave_sentiment+review_length),
+              data=reviews_scraped, family = "binomial")
 summary(help_b)
 ```
+
 ```{r}
-help_c <- glm((N_helpful) > 10 ~ (review_length)
-              ,    data=reviews_scraped, family = "binomial")
+help_c <- glm((N_helpful) > 10 ~ (review_length), 
+              data=reviews_scraped, family = "binomial")
 summary(help_c)
 ```
+
 ```{r}
 help_d <- step(help_a)
 summary(help_d)
 ```
 
-
 ```{r}
-AIC(help)
 AIC(help_a)
 AIC(help_b)
 AIC(help_c)
